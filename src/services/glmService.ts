@@ -41,6 +41,7 @@ export interface GLMStreamResponse {
     delta: {
       role?: string
       content?: string
+      reasoning_content?: string
     }
     finish_reason?: string
   }[]
@@ -117,10 +118,14 @@ export class GLMService {
               try {
                 const parsed = JSON.parse(data) as GLMStreamResponse
                 const content = parsed.choices[0]?.delta?.content
+                const reasoningContent = parsed.choices[0]?.delta?.reasoning_content
 
-                if (content) {
-                  fullContent += content
-                  console.log('收到内容:', content)
+                // 优先使用reasoning_content（GLM-4.6的实际回复内容）
+                const actualContent = reasoningContent || content
+
+                if (actualContent) {
+                  fullContent += actualContent
+                  console.log('收到内容:', actualContent)
                   console.log('累积内容:', fullContent)
                   if (onStream) {
                     onStream(fullContent)
