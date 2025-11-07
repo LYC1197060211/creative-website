@@ -63,7 +63,7 @@ export class GLMService {
       console.log('开始发送GLM API请求')
 
       const requestBody = {
-        model: 'glm-4.6',
+        model: 'glm-4',
         messages,
         stream: true,
         temperature: 0.7,
@@ -158,7 +158,7 @@ export class GLMService {
           'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: 'glm-4.6',
+          model: 'glm-4',
           messages: [{ role: 'user', content: 'Hello' }],
           max_tokens: 10,
         }),
