@@ -197,7 +197,8 @@ export default function AIOptimizePage() {
           }
         } catch (error) {
           console.error('DOCX解析错误:', error)
-          content = `文档标题：${file.name}\n\nDOCX文件解析失败：${error.message || '未知错误'}\n\n建议：\n1. 确认文件可以正常打开\n2. 尝试将文档另存为TXT格式重新上传\n3. 或者直接复制文档内容到下方文本框中进行分析`
+          const errorMessage = error instanceof Error ? error.message : '未知错误'
+          content = `文档标题：${file.name}\n\nDOCX文件解析失败：${errorMessage}\n\n建议：\n1. 确认文件可以正常打开\n2. 尝试将文档另存为TXT格式重新上传\n3. 或者直接复制文档内容到下方文本框中进行分析`
         }
       } else {
         // 其他文件类型
@@ -239,7 +240,7 @@ export default function AIOptimizePage() {
       category: ideaCategory || 'AI生成',
       priority: 'medium' as const,
       status: 'idea' as const,
-      tags: ['AI生成', optimizationOptions.find(o => o.type === result.type)?.title],
+      tags: ['AI生成', optimizationOptions.find(o => o.type === result.type)?.title].filter((tag): tag is string => tag !== undefined),
       aiSuggestions: result.content
     }
 
@@ -273,7 +274,7 @@ export default function AIOptimizePage() {
               </h1>
             </div>
             <Link href="/ideas">
-              <Button variant="outline">
+              <Button variant="secondary">
                 创意管理
               </Button>
             </Link>
@@ -507,7 +508,7 @@ export default function AIOptimizePage() {
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <div className="flex gap-2">
                       <Button
-                        variant="outline"
+                        variant="secondary"
                         size="sm"
                         onClick={() => navigator.clipboard.writeText(result.content)}
                       >

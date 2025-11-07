@@ -323,7 +323,7 @@ export function IdeasContent() {
 
             {/* 筛选按钮 */}
             <Button
-              variant="outline"
+              variant="secondary"
               onClick={() => setShowFilters(!showFilters)}
               className="flex items-center gap-2"
             >
@@ -409,7 +409,7 @@ export function IdeasContent() {
 
                 <div className="flex items-end">
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     onClick={clearFilters}
                     className="w-full"
                   >

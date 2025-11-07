@@ -1,7 +1,7 @@
 import React from 'react'
 import { cn } from '@/lib/utils'
 
-interface SpinnerProps {
+export interface SpinnerProps {
   size?: 'sm' | 'md' | 'lg'
   color?: 'primary' | 'secondary' | 'white'
   className?: string

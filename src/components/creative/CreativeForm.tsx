@@ -364,7 +364,7 @@ export const CreativeForm: React.FC<CreativeFormProps> = ({
             </h4>
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               onClick={handleAIOptimize}
               loading={isOptimizing}
               disabled={isOptimizing || (!formData.title.trim() && !formData.description.trim())}
@@ -398,7 +398,7 @@ export const CreativeForm: React.FC<CreativeFormProps> = ({
 
         {/* 操作按钮 */}
         <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-          <Button type="button" variant="outline" onClick={onClose}>
+          <Button type="button" variant="secondary" onClick={onClose}>
             取消
           </Button>
           <Button type="submit" loading={isLoading} disabled={isLoading}>

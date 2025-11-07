@@ -8,7 +8,8 @@ import {
   TemplateFormData,
   TemplateCategory,
   TemplateDifficulty,
-  TemplateReview
+  TemplateReview,
+  ResourceType
 } from '@/types/template'
 
 interface TemplateStore {
@@ -103,14 +104,14 @@ npm run dev
       {
         id: '1',
         title: 'Next.js 官方文档',
-        type: 'documentation',
+        type: ResourceType.DOCUMENTATION,
         url: 'https://nextjs.org/docs',
         description: 'Next.js 官方文档是最权威的学习资源'
       },
       {
         id: '2',
         title: 'React 基础教程',
-        type: 'course',
+        type: ResourceType.COURSE,
         url: 'https://react.dev/learn',
         description: '学习React基础知识'
       }
@@ -158,13 +159,13 @@ npm run dev
       {
         id: '3',
         title: 'Python for Data Analysis',
-        type: 'book',
+        type: ResourceType.BOOK,
         description: 'Wes McKinney 编著的Pandas权威指南'
       },
       {
         id: '4',
         title: 'Kaggle Learn',
-        type: 'course',
+        type: ResourceType.COURSE,
         url: 'https://www.kaggle.com/learn',
         description: '免费的在线数据科学课程'
       }
@@ -213,7 +214,7 @@ npm run dev
       {
         id: '5',
         title: 'React Native 官方文档',
-        type: 'documentation',
+        type: ResourceType.DOCUMENTATION,
         url: 'https://reactnative.dev/docs/getting-started',
         description: 'React Native 官方学习资源'
       }

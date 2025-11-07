@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ProjectFilter } from '@/types/project'
+import { ProjectFilter, ProjectCategory, ProjectStatus } from '@/types/project'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 
@@ -28,11 +28,11 @@ export function ProjectFilters({
   }
 
   const handleCategoryChange = (value: string) => {
-    onFilterChange({ category: value || undefined })
+    onFilterChange({ category: value ? (value as ProjectCategory) : undefined })
   }
 
   const handleStatusChange = (value: string) => {
-    onFilterChange({ status: value || undefined })
+    onFilterChange({ status: value ? (value as ProjectStatus) : undefined })
   }
 
   const handleFeaturedChange = (value: string) => {
@@ -96,7 +96,7 @@ export function ProjectFilters({
 
         {/* 清除筛选按钮 */}
         {hasActiveFilters && (
-          <Button variant="outline" size="sm" onClick={onClearFilter}>
+          <Button variant="secondary" size="sm" onClick={onClearFilter}>
             清除筛选
           </Button>
         )}

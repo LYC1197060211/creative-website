@@ -2,7 +2,7 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
   size?: 'sm' | 'md' | 'lg'
   loading?: boolean

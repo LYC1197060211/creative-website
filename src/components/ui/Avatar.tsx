@@ -79,4 +79,3 @@ export const Avatar: React.FC<AvatarProps> = ({
   )
 }
 
-export type { AvatarProps }

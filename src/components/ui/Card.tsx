@@ -1,19 +1,19 @@
 import React from 'react'
 import { cn } from '@/lib/utils'
 
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
 }
 
-interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
 }
 
-interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
 }
 
-interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
 }
 

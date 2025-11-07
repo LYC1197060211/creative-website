@@ -45,7 +45,7 @@ export default function ComponentsDemo() {
               <div className="flex flex-wrap gap-3">
                 <Button variant="primary">主要按钮</Button>
                 <Button variant="secondary">次要按钮</Button>
-                <Button variant="outline">轮廓按钮</Button>
+                <Button variant="secondary">轮廓按钮</Button>
                 <Button variant="ghost">幽灵按钮</Button>
                 <Button variant="danger">危险按钮</Button>
               </div>
@@ -236,7 +236,7 @@ export default function ComponentsDemo() {
             placeholder="在模态框中的输入框"
           />
           <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
               取消
             </Button>
             <Button onClick={() => setIsModalOpen(false)}>

@@ -166,7 +166,7 @@ export default function TestPage() {
                     运行完整测试
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     onClick={testDocumentUpload}
                     className="flex items-center gap-2"
                   >
@@ -197,7 +197,7 @@ export default function TestPage() {
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     onClick={() => navigateToPage('/dashboard')}
                     className="flex flex-col items-center gap-2 h-20"
                   >
@@ -205,7 +205,7 @@ export default function TestPage() {
                     <span className="text-xs">仪表板</span>
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     onClick={() => navigateToPage('/ideas')}
                     className="flex flex-col items-center gap-2 h-20"
                   >
@@ -213,7 +213,7 @@ export default function TestPage() {
                     <span className="text-xs">创意管理</span>
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     onClick={() => navigateToPage('/ai-optimize')}
                     className="flex flex-col items-center gap-2 h-20"
                   >
@@ -221,7 +221,7 @@ export default function TestPage() {
                     <span className="text-xs">AI优化</span>
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     onClick={() => setIsFormOpen(true)}
                     className="flex flex-col items-center gap-2 h-20"
                   >

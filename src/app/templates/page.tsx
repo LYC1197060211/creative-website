@@ -127,14 +127,14 @@ export default function TemplatesPage() {
           </div>
           <div className="flex space-x-2">
             <Button
-              variant={viewMode === 'grid' ? 'default' : 'outline'}
+              variant={viewMode === 'grid' ? 'primary' : 'outline'}
               size="sm"
               onClick={() => setViewMode('grid')}
             >
               网格视图
             </Button>
             <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
+              variant={viewMode === 'list' ? 'primary' : 'outline'}
               size="sm"
               onClick={() => setViewMode('list')}
             >

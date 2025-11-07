@@ -147,7 +147,7 @@ export default function IdeasPage() {
                 {getStatusText(idea.status)}
               </Badge>
               <div className="flex gap-2">
-                <Button variant="ghost" size="sm" asChild>
+                <Button variant="ghost" size="sm">
                   <Link href={`/ideas/${idea.id}`}>
                     <Eye className="h-4 w-4" />
                   </Link>
@@ -224,7 +224,7 @@ export default function IdeasPage() {
               </div>
 
               <div className="flex gap-2 ml-4">
-                <Button variant="ghost" size="sm" asChild>
+                <Button variant="ghost" size="sm">
                   <Link href={`/ideas/${idea.id}`}>
                     <Eye className="h-4 w-4" />
                   </Link>
@@ -328,7 +328,7 @@ export default function IdeasPage() {
 
               {/* 筛选按钮 */}
               <Button
-                variant="outline"
+                variant="secondary"
                 onClick={() => setShowFilters(!showFilters)}
                 className="flex items-center gap-2"
               >
@@ -414,7 +414,7 @@ export default function IdeasPage() {
 
                   <div className="flex items-end">
                     <Button
-                      variant="outline"
+                      variant="secondary"
                       onClick={clearFilters}
                       className="w-full"
                     >

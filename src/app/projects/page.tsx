@@ -15,6 +15,7 @@ import { ProjectFilters } from '@/components/projects/ProjectFilters'
 
 export default function ProjectsPage() {
   const {
+    projects,
     filteredProjects,
     getProjectStats,
     addProject,
@@ -96,7 +97,7 @@ export default function ProjectsPage() {
           </div>
 
           {/* Stats */}
-          <ProjectStats stats={stats} />
+          <ProjectStats projects={projects as any} />
         </div>
 
         {/* Filters */}
@@ -117,14 +118,14 @@ export default function ProjectsPage() {
           </div>
           <div className="flex space-x-2">
             <Button
-              variant={viewMode === 'grid' ? 'default' : 'outline'}
+              variant={viewMode === 'grid' ? 'primary' : 'secondary'}
               size="sm"
               onClick={() => setViewMode('grid')}
             >
               网格视图
             </Button>
             <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
+              variant={viewMode === 'list' ? 'primary' : 'secondary'}
               size="sm"
               onClick={() => setViewMode('list')}
             >

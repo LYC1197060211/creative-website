@@ -65,7 +65,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 刷新页面
               </Button>
               <Button
-                variant="outline"
+                variant="secondary"
                 onClick={() => this.setState({ hasError: false, error: undefined })}
                 className="flex-1"
               >

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-interface ModalProps {
+export interface ModalProps {
   isOpen: boolean
   onClose: () => void
   title?: string

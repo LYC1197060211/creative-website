@@ -1,17 +1,7 @@
 'use client'
 
 import { Card } from '@/components/ui/Card'
-
-interface Project {
-  id: string
-  title: string
-  description: string
-  status: string
-  tags: string[]
-  featured?: boolean
-  createdAt: Date
-  updatedAt: Date
-}
+import { Project } from '@/types/project'
 
 interface ProjectStatsProps {
   projects: Project[]
@@ -22,7 +12,7 @@ export function ProjectStats({ projects }: ProjectStatsProps) {
   const stats = {
     total: projects.length,
     completed: projects.filter(p => p.status === 'completed').length,
-    inProgress: projects.filter(p => p.status === 'in-progress').length,
+    inProgress: projects.filter(p => p.status === 'in_progress').length,
     planning: projects.filter(p => p.status === 'planning').length,
     featured: projects.filter(p => p.featured).length,
   }

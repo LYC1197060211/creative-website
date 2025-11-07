@@ -101,12 +101,12 @@ export function TemplateCard({ template, viewMode, onEdit, onDelete, onToggleFea
                 </div>
                 <div className="flex flex-wrap gap-1 mb-3">
                   {template.tags.slice(0, 3).map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-xs">
+                    <Badge key={tag} variant="secondary" className="text-xs">
                       {tag}
                     </Badge>
                   ))}
                   {template.tags.length > 3 && (
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="secondary" className="text-xs">
                       +{template.tags.length - 3}
                     </Badge>
                   )}
@@ -119,7 +119,7 @@ export function TemplateCard({ template, viewMode, onEdit, onDelete, onToggleFea
               </div>
               <div className="flex flex-col space-y-2 ml-4">
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   size="sm"
                   onClick={handleToggleFeatured}
                   title={template.featured ? '取消精选' : '设为精选'}
@@ -129,10 +129,10 @@ export function TemplateCard({ template, viewMode, onEdit, onDelete, onToggleFea
                 <Button size="sm" onClick={handleUse}>
                   使用模板
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleEdit}>
+                <Button variant="secondary" size="sm" onClick={handleEdit}>
                   编辑
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleDelete}>
+                <Button variant="secondary" size="sm" onClick={handleDelete}>
                   删除
                 </Button>
               </div>
@@ -201,12 +201,12 @@ export function TemplateCard({ template, viewMode, onEdit, onDelete, onToggleFea
 
         <div className="flex flex-wrap gap-1 mb-4">
           {template.tags.slice(0, 3).map((tag) => (
-            <Badge key={tag} variant="outline" className="text-xs">
+            <Badge key={tag} variant="secondary" className="text-xs">
               {tag}
             </Badge>
           ))}
           {template.tags.length > 3 && (
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="secondary" className="text-xs">
               +{template.tags.length - 3}
             </Badge>
           )}
@@ -248,10 +248,10 @@ export function TemplateCard({ template, viewMode, onEdit, onDelete, onToggleFea
           <Button size="sm" onClick={handleUse} className="flex-1">
             使用模板
           </Button>
-          <Button variant="outline" size="sm" onClick={handleEdit}>
+          <Button variant="secondary" size="sm" onClick={handleEdit}>
             编辑
           </Button>
-          <Button variant="outline" size="sm" onClick={handleDelete}>
+          <Button variant="secondary" size="sm" onClick={handleDelete}>
             删除
           </Button>
         </div>

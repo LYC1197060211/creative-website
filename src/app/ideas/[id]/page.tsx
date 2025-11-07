@@ -117,7 +117,7 @@ export default function IdeaDetailPage() {
               </h1>
             </div>
             <div className="flex gap-3">
-              <Button variant="outline" onClick={handleEdit}>
+              <Button variant="secondary" onClick={handleEdit}>
                 <Edit className="h-4 w-4 mr-2" />
                 编辑
               </Button>
@@ -259,7 +259,7 @@ export default function IdeaDetailPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   className="w-full justify-start"
                   onClick={handleEdit}
                 >
@@ -267,9 +267,8 @@ export default function IdeaDetailPage() {
                   编辑创意
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   className="w-full justify-start"
-                  asChild
                 >
                   <Link href="/ai-optimize">
                     <MessageSquare className="h-4 w-4 mr-2" />
@@ -277,9 +276,8 @@ export default function IdeaDetailPage() {
                   </Link>
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   className="w-full justify-start"
-                  asChild
                 >
                   <Link href="/templates">
                     <Code className="h-4 w-4 mr-2" />
@@ -312,7 +310,7 @@ export default function IdeaDetailPage() {
           </p>
           <div className="flex justify-end gap-3">
             <Button
-              variant="outline"
+              variant="secondary"
               onClick={() => setIsDeleteModalOpen(false)}
             >
               取消

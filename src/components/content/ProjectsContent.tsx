@@ -9,10 +9,11 @@ import { ProjectFilters } from '@/components/projects/ProjectFilters'
 import { useProjects } from '@/hooks/useProjects'
 
 export function ProjectsContent() {
-  const { projects, addProject, updateProject, deleteProject, setFilters } = useProjects()
+  const { projects, addProject, updateProject, deleteProject, setFilter, filter, toggleFeatured } = useProjects()
   const filteredProjects = useProjects((state) => state.filteredProjects())
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingProject, setEditingProject] = useState<string | undefined>()
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   const handleCreateProject = () => {
     setEditingProject(undefined)
@@ -28,6 +29,15 @@ export function ProjectsContent() {
     if (window.confirm('确定要删除这个项目吗？')) {
       deleteProject(projectId)
     }
+  }
+
+  const handleCreateOrUpdateProject = (projectData: any) => {
+    if (editingProject) {
+      updateProject(editingProject, projectData)
+    } else {
+      addProject(projectData)
+    }
+    setIsFormOpen(false)
   }
 
   return (
@@ -48,7 +58,7 @@ export function ProjectsContent() {
 
       {/* 筛选器 */}
       <ProjectFilters
-        filter={{}}
+        filter={filter}
         categoryOptions={[
           { value: 'web_development', label: 'Web开发' },
           { value: 'mobile_app', label: '移动应用' },
@@ -69,8 +79,8 @@ export function ProjectsContent() {
           { value: 'paused', label: '已暂停' },
           { value: 'cancelled', label: '已取消' },
         ]}
-        onFilterChange={setFilters}
-        onClearFilter={() => setFilters({})}
+        onFilterChange={setFilter}
+        onClearFilter={() => setFilter({})}
       />
 
       {/* 项目列表 */}
@@ -79,8 +89,10 @@ export function ProjectsContent() {
           <ProjectCard
             key={project.id}
             project={project}
+            viewMode={viewMode}
             onEdit={handleEditProject}
             onDelete={handleDeleteProject}
+            onToggleFeatured={toggleFeatured}
           />
         ))}
       </div>
@@ -110,11 +122,13 @@ export function ProjectsContent() {
       )}
 
       {/* 项目表单 */}
-      <ProjectForm
-        isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
-        projectId={editingProject}
-      />
+      {isFormOpen && (
+        <ProjectForm
+          projectId={editingProject}
+          onSubmit={handleCreateOrUpdateProject}
+          onCancel={() => setIsFormOpen(false)}
+        />
+      )}
     </div>
   )
 }

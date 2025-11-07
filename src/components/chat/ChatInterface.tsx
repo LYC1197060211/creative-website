@@ -5,7 +5,7 @@ import { Button, Card, CardContent, Input } from '@/components/ui'
 import { useGLMChat } from '@/hooks/useGLMChat'
 import { GLMService } from '@/services/glmService'
 import {
-  Send, Plus, Settings, MessageSquare, Trash2, Edit3, Check, X,
+  Send, Plus, MessageSquare, Trash2, Edit3, Check, X,
   Bot, User, Copy, ThumbsUp, ThumbsDown, RefreshCw, MoreVertical
 } from 'lucide-react'
 
@@ -14,7 +14,6 @@ export function ChatInterface() {
     sessions,
     currentSessionId,
     isLoading,
-    apiKey,
     currentMessage,
     setCurrentSessionId,
     createNewSession,
@@ -25,17 +24,19 @@ export function ChatInterface() {
     updateSessionTitle,
     setCurrentMessage,
     setIsLoading,
-    setApiKey,
     getCurrentSession,
   } = useGLMChat()
 
-  const [showSettings, setShowSettings] = useState(false)
-  const [tempApiKey, setTempApiKey] = useState('')
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null)
   const [editingTitle, setEditingTitle] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const glmServiceRef = useRef<GLMService | null>(null)
+
+  // 直接使用预设的API密钥
+  const API_KEY = 'eb614a329d0945b596245cb56410ba95.999UJoSMoBs65g5x'
+  const glmServiceRef = useRef<GLMService>(new GLMService(API_KEY))
+
+  console.log('GLM服务已初始化，API密钥前缀:', API_KEY.substring(0, 10) + '...')
 
   const currentSession = getCurrentSession()
 
@@ -43,28 +44,34 @@ export function ChatInterface() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [currentSession?.messages])
 
-  useEffect(() => {
-    setTempApiKey(apiKey)
-    if (apiKey) {
-      glmServiceRef.current = new GLMService(apiKey)
-    }
-  }, [apiKey])
-
+  
   const handleSendMessage = async () => {
-    if (!currentMessage.trim() || !currentSessionId || isLoading || !apiKey) return
+    if (!currentMessage.trim() || isLoading) return
+
+    console.log('开始发送消息:', currentMessage.trim())
+
+    // 如果没有当前会话，创建一个新会话
+    let sessionId = currentSessionId
+    if (!sessionId) {
+      console.log('创建新会话')
+      sessionId = handleNewSession()
+    }
+
+    // 直接使用预设的API密钥
+    console.log('使用预设API密钥')
 
     const userMessage = currentMessage.trim()
     setCurrentMessage('')
 
     // 添加用户消息
-    addMessage(currentSessionId, {
+    addMessage(sessionId, {
       content: userMessage,
       role: 'user',
     })
 
     // 添加AI助手消息占位符
     const assistantMessageId = `msg_${Date.now()}_assistant`
-    addMessage(currentSessionId, {
+    addMessage(sessionId, {
       content: '',
       role: 'assistant',
       isStreaming: true,
@@ -73,13 +80,13 @@ export function ChatInterface() {
     setIsLoading(true)
 
     try {
-      if (!glmServiceRef.current) {
-        throw new Error('GLM服务未初始化')
-      }
+      console.log('调用GLM API')
 
       // 获取会话历史
-      const session = useGLMChat.getState().getSession(currentSessionId)
+      const session = useGLMChat.getState().getSession(sessionId)
       if (!session) throw new Error('会话不存在')
+
+      console.log('会话历史:', session.messages.length, '条消息')
 
       // 构建消息历史（限制最近20条消息）
       const recentMessages = session.messages.slice(-20)
@@ -90,19 +97,21 @@ export function ChatInterface() {
           content: msg.content
         }))
 
+      console.log('发送到GLM的消息:', glmMessages)
+
       // 调用GLM API
       const response = await glmServiceRef.current.sendMessage(
         glmMessages,
         (content) => {
-          updateMessage(currentSessionId, assistantMessageId, content)
+          console.log('收到流式内容:', content)
+          updateMessage(sessionId, assistantMessageId, content)
         }
       )
 
-      // 最终更新消息
-      updateMessage(currentSessionId, assistantMessageId, response)
+      console.log('GLM API最终响应:', response)
 
       // 更新消息状态，移除流式标记
-      const updatedSession = useGLMChat.getState().getSession(currentSessionId)
+      const updatedSession = useGLMChat.getState().getSession(sessionId)
       if (updatedSession) {
         const updatedMessage = updatedSession.messages.find(m => m.id === assistantMessageId)
         if (updatedMessage) {
@@ -114,19 +123,22 @@ export function ChatInterface() {
       let errorMessage = '抱歉，发生了错误，请稍后重试。'
 
       if (error instanceof Error) {
+        console.error('错误详情:', error.message)
         if (error.message.includes('401')) {
-          errorMessage = 'API密钥无效，请检查设置中的API Key。'
+          errorMessage = 'API密钥无效，请检查API Key。'
         } else if (error.message.includes('429')) {
           errorMessage = '请求过于频繁，请稍后再试。'
         } else if (error.message.includes('network') || error.message.includes('fetch')) {
           errorMessage = '网络连接错误，请检查网络后重试。'
+        } else {
+          errorMessage = `错误: ${error.message}`
         }
       }
 
-      updateMessage(currentSessionId, assistantMessageId, errorMessage)
+      updateMessage(sessionId, assistantMessageId, errorMessage)
 
       // 更新消息状态，移除流式标记
-      const updatedSession = useGLMChat.getState().getSession(currentSessionId)
+      const updatedSession = useGLMChat.getState().getSession(sessionId)
       if (updatedSession) {
         const updatedMessage = updatedSession.messages.find(m => m.id === assistantMessageId)
         if (updatedMessage) {
@@ -148,33 +160,10 @@ export function ChatInterface() {
   const handleNewSession = () => {
     const newSessionId = createNewSession()
     setCurrentSessionId(newSessionId)
+    return newSessionId
   }
 
-  const handleSaveApiKey = async () => {
-    if (!tempApiKey.trim()) {
-      alert('请输入有效的API Key')
-      return
-    }
-
-    try {
-      // 验证API密钥
-      const glmService = new GLMService(tempApiKey.trim())
-      const isValid = await glmService.validateApiKey(tempApiKey.trim())
-
-      if (isValid) {
-        setApiKey(tempApiKey.trim())
-        glmServiceRef.current = glmService
-        setShowSettings(false)
-        alert('API Key 保存成功！')
-      } else {
-        alert('API Key 无效，请检查后重试')
-      }
-    } catch (error) {
-      console.error('API Key验证失败:', error)
-      alert('API Key 验证失败，请检查网络连接')
-    }
-  }
-
+  
   const handleCopyMessage = (content: string) => {
     navigator.clipboard.writeText(content)
   }
@@ -209,19 +198,11 @@ export function ChatInterface() {
       <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
         {/* 侧边栏头部 */}
         <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center mb-4">
             <h2 className="text-lg font-semibold text-gray-900 flex items-center">
               <MessageSquare className="w-5 h-5 mr-2 text-blue-600" />
               GLM 对话
             </h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowSettings(true)}
-              className="p-2"
-            >
-              <Settings className="w-4 h-4" />
-            </Button>
           </div>
           <Button
             onClick={handleNewSession}
@@ -449,48 +430,6 @@ export function ChatInterface() {
           </div>
         )}
       </div>
-
-      {/* 设置弹窗 */}
-      {showSettings && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="w-96 max-w-full mx-4">
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                设置
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    GLM API Key
-                  </label>
-                  <Input
-                    type="password"
-                    value={tempApiKey}
-                    onChange={(e) => setTempApiKey(e.target.value)}
-                    placeholder="输入您的 GLM API Key"
-                    className="w-full"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-3 mt-6">
-                <Button
-                  onClick={handleSaveApiKey}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  保存
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowSettings(false)}
-                  className="flex-1"
-                >
-                  取消
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
     </div>
   )
 }

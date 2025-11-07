@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { TemplateFilter } from '@/types/template'
+import { TemplateFilter, TemplateCategory, TemplateDifficulty } from '@/types/template'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 
@@ -28,11 +28,11 @@ export function TemplateFilters({
   }
 
   const handleCategoryChange = (value: string) => {
-    onFilterChange({ category: value || undefined })
+    onFilterChange({ category: value ? (value as TemplateCategory) : undefined })
   }
 
   const handleDifficultyChange = (value: string) => {
-    onFilterChange({ difficulty: value || undefined })
+    onFilterChange({ difficulty: value ? (value as TemplateDifficulty) : undefined })
   }
 
   const handleFeaturedChange = (value: string) => {
@@ -122,7 +122,7 @@ export function TemplateFilters({
 
         {/* 清除筛选按钮 */}
         {hasActiveFilters && (
-          <Button variant="outline" size="sm" onClick={onClearFilter}>
+          <Button variant="secondary" size="sm" onClick={onClearFilter}>
             清除筛选
           </Button>
         )}

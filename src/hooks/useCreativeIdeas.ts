@@ -26,6 +26,7 @@ interface CreativeIdeasState {
   clearFilters: () => void
 
   // 辅助方法
+  applyFilters: (ideas: CreativeIdea[]) => CreativeIdea[]
   getCategories: () => string[]
   getStats: () => {
     total: number

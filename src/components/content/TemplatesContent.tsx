@@ -9,10 +9,11 @@ import { TemplateFilters } from '@/components/templates/TemplateFilters'
 import { useTemplates } from '@/hooks/useTemplates'
 
 export function TemplatesContent() {
-  const { templates, addTemplate, updateTemplate, deleteTemplate, setFilters } = useTemplates()
+  const { templates, addTemplate, updateTemplate, deleteTemplate, setFilter, getTemplateStats, filter, toggleFeatured, incrementUsage } = useTemplates()
   const filteredTemplates = useTemplates((state) => state.filteredTemplates())
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingTemplate, setEditingTemplate] = useState<string | undefined>()
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   const handleCreateTemplate = () => {
     setEditingTemplate(undefined)
@@ -30,6 +31,15 @@ export function TemplatesContent() {
     }
   }
 
+  const handleCreateOrUpdateTemplate = (templateData: any) => {
+    if (editingTemplate) {
+      updateTemplate(editingTemplate, templateData)
+    } else {
+      addTemplate(templateData)
+    }
+    setIsFormOpen(false)
+  }
+
   return (
     <div className="space-y-6">
       {/* 页面标题 */}
@@ -44,11 +54,11 @@ export function TemplatesContent() {
       </div>
 
       {/* 模板统计 */}
-      <TemplateStats templates={templates} />
+      <TemplateStats stats={getTemplateStats()} />
 
       {/* 筛选器 */}
       <TemplateFilters
-        filter={{}}
+        filter={filter}
         categoryOptions={[
           { value: 'web_development', label: 'Web开发' },
           { value: 'mobile_app', label: '移动应用' },
@@ -68,8 +78,8 @@ export function TemplatesContent() {
           { value: 'advanced', label: '高级' },
           { value: 'expert', label: '专家级' },
         ]}
-        onFilterChange={setFilters}
-        onClearFilter={() => setFilters({})}
+        onFilterChange={setFilter}
+        onClearFilter={() => setFilter({})}
       />
 
       {/* 模板列表 */}
@@ -78,8 +88,11 @@ export function TemplatesContent() {
           <TemplateCard
             key={template.id}
             template={template}
+            viewMode={viewMode}
             onEdit={handleEditTemplate}
             onDelete={handleDeleteTemplate}
+            onToggleFeatured={toggleFeatured}
+            onUse={incrementUsage}
           />
         ))}
       </div>
@@ -109,11 +122,13 @@ export function TemplatesContent() {
       )}
 
       {/* 模板表单 */}
-      <TemplateForm
-        isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
-        templateId={editingTemplate}
-      />
+      {isFormOpen && (
+        <TemplateForm
+          templateId={editingTemplate}
+          onSubmit={handleCreateOrUpdateTemplate}
+          onCancel={() => setIsFormOpen(false)}
+        />
+      )}
     </div>
   )
 }

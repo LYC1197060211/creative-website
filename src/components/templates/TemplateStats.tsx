@@ -2,41 +2,17 @@
 
 import { Card } from '@/components/ui/Card'
 
-interface Template {
-  id: string
-  title: string
-  description: string
-  category: string
-  difficulty: string
-  tags: string[]
-  featured?: boolean
-  rating?: number
-  downloads?: number
-  createdAt: Date
-  updatedAt: Date
-}
-
 interface TemplateStatsProps {
-  templates: Template[]
+  stats: {
+    total: number
+    featured: number
+    categories: Record<string, number>
+    difficulties: Record<string, number>
+    averageRating: number
+  }
 }
 
-export function TemplateStats({ templates }: TemplateStatsProps) {
-  // 计算统计数据
-  const stats = {
-    total: templates.length,
-    featured: templates.filter(t => t.featured).length,
-    categories: templates.reduce((acc, template) => {
-      acc[template.category] = (acc[template.category] || 0) + 1
-      return acc
-    }, {} as Record<string, number>),
-    difficulties: templates.reduce((acc, template) => {
-      acc[template.difficulty] = (acc[template.difficulty] || 0) + 1
-      return acc
-    }, {} as Record<string, number>),
-    averageRating: templates.length > 0
-      ? templates.reduce((sum, t) => sum + (t.rating || 0), 0) / templates.length
-      : 0,
-  }
+export function TemplateStats({ stats }: TemplateStatsProps) {
   const categoryLabels = {
     web_development: 'Web开发',
     mobile_app: '移动应用',

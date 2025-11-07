@@ -99,12 +99,12 @@ export function ProjectCard({ project, viewMode, onEdit, onDelete, onToggleFeatu
                 </div>
                 <div className="flex flex-wrap gap-1 mt-2">
                   {project.tags.slice(0, 3).map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-xs">
+                    <Badge key={tag} variant="secondary" className="text-xs">
                       {tag}
                     </Badge>
                   ))}
                   {project.tags.length > 3 && (
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="secondary" className="text-xs">
                       +{project.tags.length - 3}
                     </Badge>
                   )}
@@ -112,17 +112,17 @@ export function ProjectCard({ project, viewMode, onEdit, onDelete, onToggleFeatu
               </div>
               <div className="flex space-x-2 ml-4">
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   size="sm"
                   onClick={handleToggleFeatured}
                   title={project.featured ? '取消精选' : '设为精选'}
                 >
                   {project.featured ? '⭐' : '☆'}
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleEdit}>
+                <Button variant="secondary" size="sm" onClick={handleEdit}>
                   编辑
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleDelete}>
+                <Button variant="secondary" size="sm" onClick={handleDelete}>
                   删除
                 </Button>
               </div>
@@ -212,12 +212,12 @@ export function ProjectCard({ project, viewMode, onEdit, onDelete, onToggleFeatu
 
         <div className="flex flex-wrap gap-1 mb-4">
           {project.tags.slice(0, 3).map((tag) => (
-            <Badge key={tag} variant="outline" className="text-xs">
+            <Badge key={tag} variant="secondary" className="text-xs">
               {tag}
             </Badge>
           ))}
           {project.tags.length > 3 && (
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="secondary" className="text-xs">
               +{project.tags.length - 3}
             </Badge>
           )}
@@ -248,10 +248,10 @@ export function ProjectCard({ project, viewMode, onEdit, onDelete, onToggleFeatu
           </div>
 
           <div className="flex space-x-2">
-            <Button variant="outline" size="sm" onClick={handleEdit}>
+            <Button variant="secondary" size="sm" onClick={handleEdit}>
               编辑
             </Button>
-            <Button variant="outline" size="sm" onClick={handleDelete}>
+            <Button variant="secondary" size="sm" onClick={handleDelete}>
               删除
             </Button>
           </div>

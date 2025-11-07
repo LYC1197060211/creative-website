@@ -64,7 +64,7 @@ export function Navbar() {
                 <span className="text-sm text-gray-700">欢迎,</span>
                 <span className="text-sm font-medium text-gray-900">{user?.username}</span>
               </div>
-              <Button variant="outline" size="sm" onClick={handleLogout}>
+              <Button variant="secondary" size="sm" onClick={handleLogout}>
                 退出登录
               </Button>
             </div>
@@ -124,7 +124,7 @@ export function Navbar() {
             </div>
             <div className="mt-3 px-2">
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
                 onClick={handleLogout}
                 className="w-full justify-center"

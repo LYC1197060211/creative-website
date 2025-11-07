@@ -23,7 +23,7 @@ export function DashboardContent() {
     if (ideas.length > 0 || projects.length > 0 || templates.length > 0) {
       const ideaStats = {
         total: ideas.length,
-        inProgress: ideas.filter(idea => idea.status === 'in_progress').length,
+        inProgress: ideas.filter(idea => idea.status === 'in-progress').length,
         completed: ideas.filter(idea => idea.status === 'completed').length
       }
 
@@ -147,10 +147,10 @@ export function DashboardContent() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="secondary" className="w-full justify-start">
                 ✨ AI 创意优化
               </Button>
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="secondary" className="w-full justify-start">
                 📚 浏览模板
               </Button>
             </div>
@@ -168,10 +168,10 @@ export function DashboardContent() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="secondary" className="w-full justify-start">
                 💡 创意管理
               </Button>
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="secondary" className="w-full justify-start">
                 🚀 项目展示
               </Button>
             </div>
@@ -190,10 +190,10 @@ export function DashboardContent() {
               📊 最近活动
             </h3>
             <div className="flex space-x-2">
-              <Button variant="outline" size="sm">
+              <Button variant="secondary" size="sm">
                 查看创意
               </Button>
-              <Button variant="outline" size="sm">
+              <Button variant="secondary" size="sm">
                 查看项目
               </Button>
             </div>
@@ -216,12 +216,12 @@ export function DashboardContent() {
                           {idea.description}
                         </p>
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="secondary" className="text-xs">
                             {idea.category}
                           </Badge>
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="secondary" className="text-xs">
                             {idea.status === 'completed' ? '已完成' :
-                             idea.status === 'in_progress' ? '进行中' : '计划中'}
+                             idea.status === 'in-progress' ? '进行中' : '计划中'}
                           </Badge>
                         </div>
                       </div>
@@ -251,10 +251,10 @@ export function DashboardContent() {
                           {project.description}
                         </p>
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="secondary" className="text-xs">
                             {project.category}
                           </Badge>
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="secondary" className="text-xs">
                             {project.status === 'completed' ? '已完成' :
                              project.status === 'in_progress' ? '进行中' : '计划中'}
                           </Badge>

@@ -233,7 +233,7 @@ export function AIOptimizeContent() {
       category: ideaCategory || 'AI生成',
       priority: 'medium' as const,
       status: 'idea' as const,
-      tags: ['AI生成', optimizationOptions.find(o => o.type === result.type)?.title],
+      tags: ['AI生成', optimizationOptions.find(o => o.type === result.type)?.title].filter((tag): tag is string => Boolean(tag)),
       aiSuggestions: result.content
     }
 
@@ -487,7 +487,7 @@ export function AIOptimizeContent() {
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <div className="flex gap-2">
                     <Button
-                      variant="outline"
+                      variant="secondary"
                       size="sm"
                       onClick={() => navigator.clipboard.writeText(result.content)}
                     >
