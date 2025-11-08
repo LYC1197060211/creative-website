@@ -9,6 +9,38 @@ export interface GLMChatRequest {
   stream?: boolean
   temperature?: number
   max_tokens?: number
+  tools?: GLMTool[]
+}
+
+export interface GLMTool {
+  type: string
+  function: {
+    name: string
+    description?: string
+    parameters: {
+      type: string
+      properties?: Record<string, any>
+      required?: string[]
+    }
+    max_uses?: number
+  }
+}
+
+export interface GLMToolCall {
+  id: string
+  type: string
+  function: {
+    name: string
+    arguments: string
+  }
+}
+
+export interface GLMWebSearchResult {
+  title: string
+  link: string
+  snippet: string
+  display_link: string
+  position: number
 }
 
 export interface GLMChatResponse {
@@ -42,6 +74,7 @@ export interface GLMStreamResponse {
       role?: string
       content?: string
       reasoning_content?: string
+      tool_calls?: GLMToolCall[]
     }
     finish_reason?: string
   }[]
@@ -53,6 +86,40 @@ export class GLMService {
 
   constructor(apiKey: string) {
     this.apiKey = apiKey
+  }
+
+  // 创建网页搜索工具
+  createWebSearchTool(): GLMTool {
+    return {
+      type: 'function',
+      function: {
+        name: 'web_search',
+        description: '搜索互联网获取最新信息',
+        parameters: {
+          type: 'object',
+          properties: {
+            query: {
+              type: 'string',
+              description: '搜索查询词'
+            }
+          },
+          required: ['query']
+        },
+        max_uses: 8
+      }
+    }
+  }
+
+  // 检查消息是否需要网络搜索
+  private needsWebSearch(message: string): boolean {
+    const searchKeywords = [
+      '最新', '新闻', '今天', '昨天', '现在', '实时', '当前',
+      '天气', '股票', '汇率', '价格', '行情', '资讯',
+      '搜索', '查询', '找一下', '百度', '谷歌',
+      '2025', '今年', '这个月', '这周', '最近'
+    ]
+
+    return searchKeywords.some(keyword => message.includes(keyword))
   }
 
   // 智能提取reasoning_content中的实际回复
@@ -143,17 +210,30 @@ export class GLMService {
 
   async sendMessage(
     messages: GLMMessage[],
-    onStream?: (content: string) => void
+    onStream?: (content: string) => void,
+    enableWebSearch: boolean = true
   ): Promise<string> {
     try {
       console.log('开始发送GLM API请求')
 
-      const requestBody = {
+      // 检查是否需要网络搜索
+      const lastMessage = messages[messages.length - 1]
+      const shouldUseWebSearch = enableWebSearch &&
+        lastMessage?.role === 'user' &&
+        this.needsWebSearch(lastMessage.content)
+
+      const requestBody: GLMChatRequest = {
         model: 'glm-4.6',
         messages,
         stream: true,
         temperature: 0.7,
         max_tokens: 2000,
+      }
+
+      // 如果需要网络搜索，添加工具
+      if (shouldUseWebSearch) {
+        requestBody.tools = [this.createWebSearchTool()]
+        console.log('启用网络搜索功能')
       }
 
       console.log('请求体:', JSON.stringify(requestBody, null, 2))
@@ -218,6 +298,7 @@ export class GLMService {
                 const parsed = JSON.parse(data) as GLMStreamResponse
                 const content = parsed.choices[0]?.delta?.content
                 const reasoningContent = parsed.choices[0]?.delta?.reasoning_content
+                const toolCalls = parsed.choices[0]?.delta?.tool_calls
 
                 if (content) {
                   fullContent += content
@@ -230,6 +311,22 @@ export class GLMService {
                 if (reasoningContent) {
                   fullReasoningContent += reasoningContent
                   console.log('收到reasoning_content:', reasoningContent.substring(0, 50) + (reasoningContent.length > 50 ? '...' : ''))
+                }
+
+                if (toolCalls && toolCalls.length > 0) {
+                  console.log('收到工具调用:', toolCalls)
+                  // 处理工具调用结果，这里可以添加对搜索结果的处理
+                  toolCalls.forEach(toolCall => {
+                    if (toolCall.function.name === 'web_search') {
+                      try {
+                        const args = JSON.parse(toolCall.function.arguments)
+                        console.log('网络搜索参数:', args)
+                        // 可以在这里添加对搜索结果的特殊处理
+                      } catch (error) {
+                        console.warn('解析工具调用参数失败:', error)
+                      }
+                    }
+                  })
                 }
               } catch (parseError) {
                 console.warn('解析流数据失败:', data, '错误:', parseError.message)

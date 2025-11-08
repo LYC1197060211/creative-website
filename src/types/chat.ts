@@ -14,6 +14,10 @@ export interface ChatSession {
   updatedAt: Date
 }
 
+export type ChatMessageInput =
+  Omit<ChatMessage, 'id' | 'timestamp'> &
+  Partial<Pick<ChatMessage, 'id' | 'timestamp'>>
+
 export interface GLMChatState {
   sessions: ChatSession[]
   currentSessionId: string | null
@@ -22,7 +26,7 @@ export interface GLMChatState {
   currentMessage: string
   setCurrentSessionId: (id: string | null) => void
   createNewSession: () => string
-  addMessage: (sessionId: string, message: Omit<ChatMessage, 'id' | 'timestamp'>) => void
+  addMessage: (sessionId: string, message: ChatMessageInput) => string
   updateMessage: (sessionId: string, messageId: string, content: string) => void
   deleteMessage: (sessionId: string, messageId: string) => void
   deleteSession: (sessionId: string) => void

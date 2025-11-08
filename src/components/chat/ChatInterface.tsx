@@ -6,7 +6,8 @@ import { useGLMChat } from '@/hooks/useGLMChat'
 import { GLMService } from '@/services/glmService'
 import {
   Send, Plus, MessageSquare, Trash2, Edit3, Check, X,
-  Bot, User, Copy, ThumbsUp, ThumbsDown, RefreshCw, MoreVertical
+  Bot, User, Copy, ThumbsUp, ThumbsDown, RefreshCw, MoreVertical,
+  Globe, Search
 } from 'lucide-react'
 
 export function ChatInterface() {
@@ -29,6 +30,7 @@ export function ChatInterface() {
 
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null)
   const [editingTitle, setEditingTitle] = useState('')
+  const [enableWebSearch, setEnableWebSearch] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -70,8 +72,7 @@ export function ChatInterface() {
     })
 
     // 添加AI助手消息占位符
-    const assistantMessageId = `msg_${Date.now()}_assistant`
-    addMessage(sessionId, {
+    const assistantMessageId = addMessage(sessionId, {
       content: '',
       role: 'assistant',
       isStreaming: true,
@@ -105,7 +106,8 @@ export function ChatInterface() {
         (content) => {
           console.log('收到流式内容:', content)
           updateMessage(sessionId, assistantMessageId, content)
-        }
+        },
+        enableWebSearch
       )
 
       console.log('GLM API最终响应:', response)
@@ -383,6 +385,35 @@ export function ChatInterface() {
 
             {/* 输入区域 */}
             <div className="border-t border-gray-200 bg-white px-6 py-4">
+              {/* 网络搜索开关 */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm text-gray-700">网络搜索</span>
+                  <button
+                    onClick={() => setEnableWebSearch(!enableWebSearch)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      enableWebSearch ? 'bg-blue-600' : 'bg-gray-300'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        enableWebSearch ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                  {enableWebSearch && (
+                    <span className="text-xs text-green-600 flex items-center gap-1">
+                      <Search className="w-3 h-3" />
+                      已启用
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {enableWebSearch ? '将自动搜索最新信息' : '仅使用模型内部知识'}
+                </div>
+              </div>
+
               <div className="flex gap-4">
                 <div className="flex-1">
                   <textarea
@@ -390,7 +421,7 @@ export function ChatInterface() {
                     value={currentMessage}
                     onChange={(e) => setCurrentMessage(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="输入您的消息..."
+                    placeholder={enableWebSearch ? "输入您的消息...（支持网络搜索最新信息）" : "输入您的消息..."}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     rows={3}
                     disabled={isLoading}

@@ -2,7 +2,7 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { GLMChatState, ChatMessage, ChatSession } from '@/types/chat'
+import type { GLMChatState, ChatMessage, ChatSession, ChatMessageInput } from '@/types/chat'
 
 export const useGLMChat = create<GLMChatState>()(
   persist(
@@ -33,11 +33,13 @@ export const useGLMChat = create<GLMChatState>()(
         return sessionId
       },
 
-      addMessage: (sessionId, message) => {
+      addMessage: (sessionId, message: ChatMessageInput): string => {
+        const newMessageId = message.id ?? `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        const timestamp = message.timestamp ?? new Date()
         const newMessage: ChatMessage = {
           ...message,
-          id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          timestamp: new Date(),
+          id: newMessageId,
+          timestamp,
         }
 
         set((state) => {
@@ -63,6 +65,8 @@ export const useGLMChat = create<GLMChatState>()(
 
           return { sessions }
         })
+
+        return newMessageId
       },
 
       updateMessage: (sessionId, messageId, content) => {
