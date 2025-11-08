@@ -339,7 +339,12 @@ export function ChatInterface() {
 
                     {/* 消息操作 */}
                     <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
-                      <span>{message.timestamp.toLocaleTimeString()}</span>
+                      <span>
+                        {message.timestamp instanceof Date
+                          ? message.timestamp.toLocaleTimeString()
+                          : new Date(message.timestamp).toLocaleTimeString()
+                        }
+                      </span>
                       <div className="flex items-center gap-1">
                         <Button
                           size="sm"
