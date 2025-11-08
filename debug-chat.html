@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天功能调试</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .chat-box { border: 1px solid #ccc; height: 400px; overflow-y: auto; padding: 10px; margin: 10px 0; }
+        .input-box { width: 70%; padding: 10px; }
+        .send-btn { padding: 10px 20px; }
+        .message { margin: 5px 0; padding: 5px; }
+        .user { text-align: right; color: blue; }
+        .assistant { text-align: left; color: green; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GLM-4.6 聊天功能调试</h1>
+        <div class="chat-box" id="chatBox"></div>
+        <div>
+            <input type="text" id="messageInput" class="input-box" placeholder="输入消息..." />
+            <button onclick="sendMessage()" class="send-btn">发送</button>
+        </div>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        const API_KEY = 'eb614a329d0945b596245cb56410ba95.999UJoSMoBs65g5x';
+        const BASE_URL = 'https://open.bigmodel.cn/api/paas/v4';
+
+        function addMessage(role, content) {
+            const chatBox = document.getElementById('chatBox');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            messageDiv.textContent = `${role}: ${content}`;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function updateStatus(status) {
+            document.getElementById('status').textContent = status;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            addMessage('user', message);
+            input.value = '';
+            updateStatus('发送中...');
+
+            try {
+                const response = await fetch(`${BASE_URL}/chat/completions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`,
+                    },
+                    body: JSON.stringify({
+                        model: 'glm-4.6',
+                        messages: [{ role: 'user', content: message }],
+                        stream: false,
+                        temperature: 0.7,
+                        max_tokens: 500
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const aiMessage = data.choices[0]?.message;
+
+                let reply = '';
+                if (aiMessage.content) {
+                    reply = aiMessage.content;
+                } else if (aiMessage.reasoning_content) {
+                    // 简单提取
+                    const quotedMatch = aiMessage.reasoning_content.match(/"([^"]{1,30})"/);
+                    if (quotedMatch) {
+                        reply = quotedMatch[1];
+                    } else {
+                        reply = aiMessage.reasoning_content.substring(0, 200) + '...';
+                    }
+                }
+
+                addMessage('assistant', reply);
+                updateStatus('发送成功');
+
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('system', `错误: ${error.message}`);
+                updateStatus('发送失败');
+            }
+        }
+
+        // 回车发送
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        updateStatus('准备就绪');
+    </script>
+</body>
+</html>

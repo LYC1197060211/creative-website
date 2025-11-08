@@ -64,16 +64,19 @@ export class GLMService {
 
     console.log('开始解析reasoning_content...')
 
-    // 1. 首先尝试提取引号内容，但排除用户的原话
-    const quotedMatches = reasoningContent.match(/"([^"]{1,30})"/g)
+    // 1. 首先尝试提取引号内容，但排除用户的原话和分析性内容
+    const quotedMatches = reasoningContent.match(/"([^"]{1,50})"/g)
     if (quotedMatches) {
       for (const match of quotedMatches) {
         const content = match.replace(/"/g, '').trim()
         console.log('找到引号内容:', content)
-        // 排除用户请求的常见内容
-        if (content && content.length > 1 && content.length < 30 &&
+        // 排除用户请求和分析性内容
+        if (content && content.length > 1 && content.length < 50 &&
             !content.includes('请') && !content.includes('简单回复') &&
-            !content.includes('问候语') && !content.includes('你好，请')) {
+            !content.includes('问候语') && !content.includes('你好，请') &&
+            !content.includes('分析') && !content.includes('用户') &&
+            !content.includes('请求') && !content.includes('任务') &&
+            !content.includes('核心') && !content.includes('关键词')) {
           return content
         }
       }
@@ -81,46 +84,61 @@ export class GLMService {
 
     // 2. 尝试特定模式匹配
     const specificPatterns = [
-      /(?:回复|回答|选择)[：:]\s*([^\n]{1,30})/,
-      /(?:因此|所以|最终)[：:]\s*([^\n]{1,30})/,
-      /(?:决定是|最佳选项)[：:]\s*([^\n]{1,30})/,
+      /(?:回复|回答|选择)[：:]\s*"([^"]{1,50})"/,
+      /(?:回复|回答|选择)[：:]\s*([^\n]{1,50})/,
+      /(?:因此|所以|最终)[：:]\s*"([^"]{1,50})"/,
+      /(?:因此|所以|最终)[：:]\s*([^\n]{1,50})/,
+      /(?:决定是|最佳选项)[：:]\s*"([^"]{1,50})"/,
+      /(?:决定是|最佳选项)[：:]\s*([^\n]{1,50})/,
     ]
 
     for (const pattern of specificPatterns) {
       const match = reasoningContent.match(pattern)
-      if (match && match[1]) {
-        const content = match[1].trim().replace(/[。！？]/g, '')
+      if (match) {
+        const content = (match[1] || match[0]).trim().replace(/[。！？]/g, '')
         console.log('找到模式匹配:', content)
-        if (content && content.length > 1 && content.length < 30) {
+        if (content && content.length > 1 && content.length < 50 &&
+            !content.includes('分析') && !content.includes('用户') &&
+            !content.includes('请求') && !content.includes('任务')) {
           return content
         }
       }
     }
 
-    // 3. 尝试找简短的句子
+    // 3. 尝试找简短的、有意义的句子
     const sentences = reasoningContent.split(/[。！？\n]+/)
     for (let i = sentences.length - 1; i >= 0; i--) {
       const sentence = sentences[i].trim()
-      if (sentence.length > 2 && sentence.length < 30 &&
-          !sentence.includes('**') && !sentence.includes('分析') &&
-          !sentence.includes('用户') && !sentence.includes('请求') &&
-          !sentence.includes('核心') && !sentence.includes('任务')) {
+      if (sentence.length > 3 && sentence.length < 50 &&
+          !sentence.includes('**') && !sentence.includes('*') &&
+          !sentence.includes('分析') && !sentence.includes('用户') &&
+          !sentence.includes('请求') && !sentence.includes('核心') &&
+          !sentence.includes('任务') && !sentence.includes('关键词') &&
+          !sentence.includes('约束') && !sentence.includes('模式') &&
+          !sentence.includes('选择') && !sentence.includes('选项') &&
+          !sentence.includes('考虑') && !sentence.includes('需要') &&
+          !sentence.includes('应该') && !sentence.includes('可以') &&
+          !sentence.match(/^[0-9]+[\.\)]\s*/)) { // 排除编号列表
         console.log('找到合适句子:', sentence)
         return sentence
       }
     }
 
-    // 4. 如果都没有找到，返回最后一句（清理后）
-    const lastSentence = sentences[sentences.length - 2] // 倒数第二句，避免空字符串
-    if (lastSentence && lastSentence.trim().length > 0) {
-      const cleaned = lastSentence.trim().replace(/[**\*]/g, '')
-      console.log('使用最后一句:', cleaned)
-      return cleaned
+    // 4. 如果都没有找到，尝试简单清理并返回最后有意义的内容
+    for (let i = sentences.length - 1; i >= 0; i--) {
+      const sentence = sentences[i].trim()
+      if (sentence.length > 5) {
+        const cleaned = sentence.replace(/[**\*]/g, '').trim()
+        if (cleaned.length < 100) {
+          console.log('使用清理后的句子:', cleaned)
+          return cleaned
+        }
+      }
     }
 
     // 5. 最后的后备方案
     console.log('使用后备方案')
-    return reasoningContent.substring(Math.max(0, reasoningContent.length - 50))
+    return reasoningContent.substring(Math.max(0, reasoningContent.length - 100))
   }
 
   async sendMessage(
@@ -214,7 +232,19 @@ export class GLMService {
                   console.log('收到reasoning_content:', reasoningContent.substring(0, 50) + (reasoningContent.length > 50 ? '...' : ''))
                 }
               } catch (parseError) {
-                console.warn('解析流数据失败:', data)
+                console.warn('解析流数据失败:', data, '错误:', parseError.message)
+                // 尝试修复常见的JSON问题
+                try {
+                  const fixedData = data.replace(/\\n/g, '\\\\n').replace(/\\"/g, '\\\\"')
+                  const parsed = JSON.parse(fixedData) as GLMStreamResponse
+                  const reasoningContent = parsed.choices[0]?.delta?.reasoning_content
+                  if (reasoningContent) {
+                    fullReasoningContent += reasoningContent
+                    console.log('修复后收到reasoning_content:', reasoningContent.substring(0, 50) + '...')
+                  }
+                } catch (secondError) {
+                  console.warn('修复后仍然解析失败')
+                }
               }
             }
           }
