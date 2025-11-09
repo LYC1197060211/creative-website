@@ -2,14 +2,15 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 
 export function Navbar() {
-  const { user, logout } = useAuth()
+  const { user, logout, isLoading } = useAuth()
   const pathname = usePathname()
+  const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const navigation = [
@@ -20,8 +21,9 @@ export function Navbar() {
     { name: '模板库', href: '/templates', icon: '📚' },
   ]
 
-  const handleLogout = () => {
-    logout()
+  const handleLogout = async () => {
+    await logout()
+    router.push('/auth')
   }
 
   return (
@@ -59,15 +61,30 @@ export function Navbar() {
 
           {/* User menu */}
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-700">欢迎,</span>
-                <span className="text-sm font-medium text-gray-900">{user?.username}</span>
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-700">欢迎,</span>
+                  <span className="text-sm font-medium text-gray-900">{user.username}</span>
+                </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleLogout}
+                  disabled={isLoading}
+                >
+                  {isLoading ? '退出中...' : '退出登录'}
+                </Button>
               </div>
-              <Button variant="secondary" size="sm" onClick={handleLogout}>
-                退出登录
-              </Button>
-            </div>
+            ) : (
+              <div className="flex items-center space-x-4">
+                <Link href="/auth">
+                  <Button variant="primary" size="sm">
+                    登录
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -118,20 +135,37 @@ export function Navbar() {
             })}
           </div>
           <div className="pt-4 pb-3 border-t border-gray-200">
-            <div className="px-4 py-2">
-              <div className="text-base font-medium text-gray-800">{user?.username}</div>
-              <div className="text-sm text-gray-500">创意工坊用户</div>
-            </div>
-            <div className="mt-3 px-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={handleLogout}
-                className="w-full justify-center"
-              >
-                退出登录
-              </Button>
-            </div>
+            {user ? (
+              <>
+                <div className="px-4 py-2">
+                  <div className="text-base font-medium text-gray-800">{user.username}</div>
+                  <div className="text-sm text-gray-500">创意工坊用户</div>
+                </div>
+                <div className="mt-3 px-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={handleLogout}
+                    disabled={isLoading}
+                    className="w-full justify-center"
+                  >
+                    {isLoading ? '退出中...' : '退出登录'}
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="mt-3 px-2">
+                <Link href="/auth" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="w-full justify-center"
+                  >
+                    登录
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}

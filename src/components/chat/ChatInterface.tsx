@@ -4,10 +4,11 @@ import { useState, useEffect, useRef } from 'react'
 import { Button, Card, CardContent, Input } from '@/components/ui'
 import { useGLMChat } from '@/hooks/useGLMChat'
 import { GLMService } from '@/services/glmService'
+import type { SearchResult } from '@/types/chat'
 import {
   Send, Plus, MessageSquare, Trash2, Edit3, Check, X,
-  Bot, User, Copy, ThumbsUp, ThumbsDown, RefreshCw, MoreVertical,
-  Globe, Search
+  Bot, User, Copy, ThumbsUp, ThumbsDown, RefreshCw,
+  Globe, Search, Clock, ArrowUpRight, AlertTriangle
 } from 'lucide-react'
 
 export function ChatInterface() {
@@ -20,7 +21,6 @@ export function ChatInterface() {
     createNewSession,
     addMessage,
     updateMessage,
-    deleteMessage,
     deleteSession,
     updateSessionTitle,
     setCurrentMessage,
@@ -31,6 +31,7 @@ export function ChatInterface() {
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null)
   const [editingTitle, setEditingTitle] = useState('')
   const [enableWebSearch, setEnableWebSearch] = useState(true)
+  const [sessionPendingDelete, setSessionPendingDelete] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -46,6 +47,27 @@ export function ChatInterface() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [currentSession?.messages])
 
+  const buildSearchSummary = (results: SearchResult[], timestamp?: string, query?: string) => {
+    if (!results || results.length === 0) {
+      return ''
+    }
+
+    const sanitize = (text: string) => text.replace(/\s+/g, ' ').trim()
+    const truncate = (text: string, max = 160) =>
+      text.length > max ? `${text.slice(0, max)}…` : text
+
+    const lines = results.map((result, index) => {
+      const headline = sanitize(result.title || result.source || `结果 ${index + 1}`)
+      const summary = sanitize(result.summary || '暂无摘要')
+      return `${index + 1}. ${headline}：${truncate(summary)}`
+    })
+
+    const timestampLine = timestamp ? `（更新于 ${timestamp}）` : ''
+    const queryLine = query ? `查询：${query}` : ''
+
+    return `📌 搜索综合总结 ${timestampLine}\n${queryLine ? `${queryLine}\n` : ''}${lines.join('\n')}\n\n（以上结论基于最新联网搜索结果）`
+  }
+
   
   const handleSendMessage = async () => {
     if (!currentMessage.trim() || isLoading) return
@@ -56,7 +78,12 @@ export function ChatInterface() {
     let sessionId = currentSessionId
     if (!sessionId) {
       console.log('创建新会话')
-      sessionId = handleNewSession()
+      ;(async () => {
+        const newSessionId = await handleNewSession()
+        setCurrentSessionId(newSessionId)
+        // 继续发送消息的逻辑...
+      })()
+      return
     }
 
     // 直接使用预设的API密钥
@@ -101,14 +128,40 @@ export function ChatInterface() {
       console.log('发送到GLM的消息:', glmMessages)
 
       // 调用GLM API
-      const response = await glmServiceRef.current.sendMessage(
-        glmMessages,
-        (content) => {
-          console.log('收到流式内容:', content)
-          updateMessage(sessionId, assistantMessageId, content)
-        },
-        enableWebSearch
-      )
+    const response = await glmServiceRef.current.sendMessage(
+      glmMessages,
+      (content) => {
+        console.log('收到流式内容:', content)
+        updateMessage(sessionId, assistantMessageId, content)
+      },
+      enableWebSearch,
+      (searchPayload) => {
+        const timestamp = new Date().toLocaleString()
+        console.log('网络搜索结果:', searchPayload.formattedText)
+        addMessage(sessionId, {
+          content: searchPayload.formattedText,
+          role: 'assistant',
+          searchResults: searchPayload.structuredResults,
+          searchMetadata: {
+            timestamp,
+            query: userMessage,
+          },
+        })
+
+        const summaryText = buildSearchSummary(searchPayload.structuredResults, timestamp, userMessage)
+        if (summaryText) {
+          addMessage(sessionId, {
+            content: summaryText,
+            role: 'assistant',
+            isSearchSummary: true,
+            searchMetadata: {
+              timestamp,
+              query: userMessage,
+            },
+          })
+        }
+      }
+    )
 
       console.log('GLM API最终响应:', response)
 
@@ -171,10 +224,20 @@ export function ChatInterface() {
   }
 
   const handleDeleteSession = (sessionId: string) => {
-    if (window.confirm('确定要删除这个对话吗？')) {
-      deleteSession(sessionId)
+    setSessionPendingDelete(sessionId)
+  }
+
+  const confirmDeleteSession = () => {
+    if (sessionPendingDelete) {
+      deleteSession(sessionPendingDelete)
+      setSessionPendingDelete(null)
     }
   }
+
+  const cancelDeleteSession = () => {
+    setSessionPendingDelete(null)
+  }
+
 
   const handleStartEditTitle = (session: any) => {
     setEditingSessionId(session.id)
@@ -195,6 +258,7 @@ export function ChatInterface() {
   }
 
   return (
+    <>
     <div className="flex h-screen bg-gray-50">
       {/* 侧边栏 */}
       <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
@@ -308,7 +372,7 @@ export function ChatInterface() {
 
             {/* 消息区域 */}
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
-              {currentSession.messages.map((message, index) => (
+              {currentSession.messages.map((message) => (
                 <div
                   key={message.id}
                   className={`flex gap-4 ${
@@ -330,12 +394,116 @@ export function ChatInterface() {
                         : 'bg-white border-gray-200'
                     }`}>
                       <CardContent className="p-4">
-                        <div className="whitespace-pre-wrap break-words">
-                          {message.content}
-                          {message.isStreaming && (
-                            <span className="inline-block w-2 h-4 bg-gray-400 animate-pulse ml-1" />
-                          )}
-                        </div>
+                        {message.searchResults && message.searchResults.length > 0 ? (
+                          <div className="space-y-4">
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-xs text-gray-500">
+                              <div className="flex items-center gap-2 font-semibold text-gray-800">
+                                <Search className="w-4 h-4 text-blue-600" />
+                                <span>{message.content.split('\n')[0] || '🔎 网络搜索结果'}</span>
+                              </div>
+                              <div className="flex flex-wrap items-center gap-2">
+                                {message.searchMetadata?.query && (
+                                  <span className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs text-blue-700">
+                                    查询：{message.searchMetadata.query}
+                                  </span>
+                                )}
+                                {message.searchMetadata?.timestamp && (
+                                  <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                                    <Clock className="w-3 h-3" />
+                                    更新于 {message.searchMetadata.timestamp}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="relative space-y-4 border-l border-blue-100 pl-6">
+                              {message.searchResults.map((result, index) => (
+                                <div
+                                  key={`${result.link || result.title}-${index}`}
+                                  className="relative rounded-xl border border-gray-100 bg-white/90 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200"
+                                >
+                                  <span className="absolute -left-3 top-4 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white shadow">
+                                    {index + 1}
+                                  </span>
+                                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-gray-500">
+                                    <span className="inline-flex items-center gap-1 text-blue-500">
+                                      <Search className="w-3 h-3" />
+                                      {result.source}
+                                    </span>
+                                    {result.publishedAt && (
+                                      <span className="inline-flex items-center gap-1">
+                                        <Clock className="w-3 h-3" />
+                                        {result.publishedAt}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <a
+                                    className="mt-2 block text-base font-semibold text-gray-900 hover:text-blue-600"
+                                    href={result.link || '#'}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    {result.title}
+                                  </a>
+                                  <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                                    {result.summary || '该结果暂无摘要信息。'}
+                                  </p>
+                                  <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+                                    <span className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1">
+                                      来源：{result.source}
+                                    </span>
+                                    {result.link && (
+                                      <a
+                                        className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-blue-600 hover:underline"
+                                        href={result.link}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                      >
+                                        查看来源
+                                        <ArrowUpRight className="w-3 h-3" />
+                                      </a>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ) : message.isSearchSummary ? (
+                          <div className="rounded-xl border border-blue-100 bg-blue-50/80 p-4 shadow-inner">
+                            <div className="flex items-center justify-between text-sm font-semibold text-blue-900">
+                              <span>📌 搜索综合总结</span>
+                              {message.searchMetadata?.timestamp && (
+                                <span className="text-xs text-blue-700/70">
+                                  更新于 {message.searchMetadata.timestamp}
+                                </span>
+                              )}
+                            </div>
+                            {message.searchMetadata?.query && (
+                              <p className="mt-1 text-xs text-blue-800">
+                                查询关键词：{message.searchMetadata.query}
+                              </p>
+                            )}
+                            <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-blue-900/90">
+                              {message.content
+                                .split('\n')
+                                .filter((line) => /^\d+\./.test(line.trim()))
+                                .map((line, idx) => (
+                                  <li key={`${line}-${idx}`} className="leading-relaxed">
+                                    {line.replace(/^\d+\.\s*/, '')}
+                                  </li>
+                                ))}
+                            </ol>
+                            <p className="mt-3 text-xs text-blue-700/70">
+                              （以上结论基于最新联网搜索结果，供进一步分析参考）
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="whitespace-pre-wrap break-words">
+                            {message.content}
+                            {message.isStreaming && (
+                              <span className="inline-block w-2 h-4 bg-gray-400 animate-pulse ml-1" />
+                            )}
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
 
@@ -410,7 +578,7 @@ export function ChatInterface() {
                   )}
                 </div>
                 <div className="text-xs text-gray-500">
-                  {enableWebSearch ? '将自动搜索最新信息' : '仅使用模型内部知识'}
+                  {enableWebSearch ? '将自动搜索最新信息' : '仅在识别到实时需求时才会联网'}
                 </div>
               </div>
 
@@ -467,5 +635,32 @@ export function ChatInterface() {
         )}
       </div>
     </div>
+    {sessionPendingDelete && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+        <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl">
+          <div className="flex items-center gap-3 border-b border-gray-100 px-6 py-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50 text-red-500">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">删除对话</h3>
+              <p className="text-sm text-gray-500">操作不可撤销，请再次确认。</p>
+            </div>
+          </div>
+          <div className="px-6 py-5 text-sm text-gray-700">
+            您确定要删除该对话及其所有消息吗？删除后将无法恢复。
+          </div>
+          <div className="flex items-center justify-end gap-3 border-t border-gray-100 px-6 py-4">
+            <Button variant="ghost" onClick={cancelDeleteSession}>
+              取消
+            </Button>
+            <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={confirmDeleteSession}>
+              删除对话
+            </Button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }

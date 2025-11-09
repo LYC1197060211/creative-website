@@ -4,6 +4,9 @@ export interface ChatMessage {
   role: 'user' | 'assistant'
   timestamp: Date
   isStreaming?: boolean
+  searchResults?: SearchResult[]
+  isSearchSummary?: boolean
+  searchMetadata?: SearchMetadata
 }
 
 export interface ChatSession {
@@ -17,6 +20,19 @@ export interface ChatSession {
 export type ChatMessageInput =
   Omit<ChatMessage, 'id' | 'timestamp'> &
   Partial<Pick<ChatMessage, 'id' | 'timestamp'>>
+
+export interface SearchResult {
+  title: string
+  summary: string
+  link: string
+  source: string
+  publishedAt?: string
+}
+
+export interface SearchMetadata {
+  timestamp?: string
+  query?: string
+}
 
 export interface GLMChatState {
   sessions: ChatSession[]

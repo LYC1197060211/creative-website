@@ -2,20 +2,29 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { CreativeIdea } from '@/types'
 import { generateId, formatDate } from '@/lib/utils'
+import { Idea } from '@/types/database'
+import { useAuth } from './useAuth'
 
 interface CreativeIdeasState {
   ideas: CreativeIdea[]
   filteredIdeas: CreativeIdea[]
   isLoading: boolean
+  error: string | null
+  isSyncing: boolean
+  lastSyncTime: Date | null
   searchTerm: string
   selectedCategory: string
   selectedStatus: string
   selectedPriority: string
 
+  // 云端同步操作
+  fetchIdeas: () => Promise<void>
+  syncIdeas: () => Promise<void>
+
   // 基础操作
-  addIdea: (idea: Omit<CreativeIdea, 'id' | 'createdAt' | 'updatedAt'>) => void
-  updateIdea: (id: string, updates: Partial<CreativeIdea>) => void
-  deleteIdea: (id: string) => void
+  addIdea: (idea: Omit<CreativeIdea, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>
+  updateIdea: (id: string, updates: Partial<CreativeIdea>) => Promise<void>
+  deleteIdea: (id: string) => Promise<void>
   getIdeaById: (id: string) => CreativeIdea | undefined
 
   // 筛选和搜索
@@ -34,6 +43,7 @@ interface CreativeIdeasState {
     inProgress: number
     planning: number
   }
+  clearError: () => void
 }
 
 export const useCreativeIdeas = create<CreativeIdeasState>()(
@@ -42,50 +52,216 @@ export const useCreativeIdeas = create<CreativeIdeasState>()(
       ideas: [],
       filteredIdeas: [],
       isLoading: false,
+      error: null,
+      isSyncing: false,
+      lastSyncTime: null,
       searchTerm: '',
       selectedCategory: '',
       selectedStatus: '',
       selectedPriority: '',
 
-      addIdea: (ideaData) => {
-        const newIdea: CreativeIdea = {
-          ...ideaData,
-          id: generateId(),
-          createdAt: new Date(),
-          updatedAt: new Date(),
+      // 云端同步操作
+      fetchIdeas: async () => {
+        const auth = useAuth.getState()
+        if (!auth.session) {
+          set({ error: '用户未登录' })
+          return
         }
 
-        set((state) => {
-          const updatedIdeas = [...state.ideas, newIdea]
-          return {
-            ideas: updatedIdeas,
-            filteredIdeas: state.applyFilters(updatedIdeas)
+        set({ isLoading: true, error: null })
+
+        try {
+          const response = await fetch('/api/ideas', {
+            headers: {
+              'Authorization': `Bearer ${auth.session.access_token}`,
+            },
+          })
+
+          if (!response.ok) {
+            const error = await response.text()
+            throw new Error(error)
           }
-        })
+
+          const ideas: Idea[] = await response.json()
+
+          // 转换数据库格式到前端格式
+          const frontendIdeas: CreativeIdea[] = ideas.map(idea => ({
+            id: idea.id,
+            title: idea.title,
+            description: idea.description,
+            tags: idea.tags,
+            category: idea.category,
+            priority: idea.priority,
+            status: idea.status as any,
+            techStack: idea.tech_stack,
+            aiSuggestions: idea.ai_suggestions,
+            createdAt: new Date(idea.created_at),
+            updatedAt: new Date(idea.updated_at),
+          }))
+
+          set({
+            ideas: frontendIdeas,
+            filteredIdeas: get().applyFilters(frontendIdeas),
+            lastSyncTime: new Date()
+          })
+        } catch (error) {
+          console.error('获取创意列表失败:', error)
+          set({ error: '获取创意列表失败' })
+        } finally {
+          set({ isLoading: false })
+        }
       },
 
-      updateIdea: (id, updates) => {
-        set((state) => {
-          const updatedIdeas = state.ideas.map((idea) =>
-            idea.id === id
-              ? { ...idea, ...updates, updatedAt: new Date() }
-              : idea
-          )
-          return {
-            ideas: updatedIdeas,
-            filteredIdeas: state.applyFilters(updatedIdeas)
-          }
-        })
+      syncIdeas: async () => {
+        set({ isSyncing: true, error: null })
+        await get().fetchIdeas()
+        set({ isSyncing: false })
       },
 
-      deleteIdea: (id) => {
-        set((state) => {
-          const updatedIdeas = state.ideas.filter((idea) => idea.id !== id)
-          return {
-            ideas: updatedIdeas,
-            filteredIdeas: state.applyFilters(updatedIdeas)
+      // 基础操作
+      addIdea: async (ideaData) => {
+        const auth = useAuth.getState()
+        if (!auth.session) {
+          set({ error: '用户未登录' })
+          return
+        }
+
+        set({ error: null })
+
+        try {
+          const response = await fetch('/api/ideas', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${auth.session.access_token}`,
+            },
+            body: JSON.stringify(ideaData),
+          })
+
+          if (!response.ok) {
+            const error = await response.text()
+            throw new Error(error)
           }
-        })
+
+          const newIdea: Idea = await response.json()
+
+          // 转换为前端格式
+          const frontendIdea: CreativeIdea = {
+            id: newIdea.id,
+            title: newIdea.title,
+            description: newIdea.description,
+            tags: newIdea.tags,
+            category: newIdea.category,
+            priority: newIdea.priority,
+            status: newIdea.status as any,
+            techStack: newIdea.tech_stack,
+            aiSuggestions: newIdea.ai_suggestions,
+            createdAt: new Date(newIdea.created_at),
+            updatedAt: new Date(newIdea.updated_at),
+          }
+
+          set((state) => {
+            const updatedIdeas = [...state.ideas, frontendIdea]
+            return {
+              ideas: updatedIdeas,
+              filteredIdeas: state.applyFilters(updatedIdeas)
+            }
+          })
+        } catch (error) {
+          console.error('创建创意失败:', error)
+          set({ error: '创建创意失败' })
+        }
+      },
+
+      updateIdea: async (id, updates) => {
+        const auth = useAuth.getState()
+        if (!auth.session) {
+          set({ error: '用户未登录' })
+          return
+        }
+
+        set({ error: null })
+
+        try {
+          const response = await fetch(`/api/ideas/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${auth.session.access_token}`,
+            },
+            body: JSON.stringify(updates),
+          })
+
+          if (!response.ok) {
+            const error = await response.text()
+            throw new Error(error)
+          }
+
+          const updatedIdea: Idea = await response.json()
+
+          // 转换为前端格式
+          const frontendIdea: CreativeIdea = {
+            id: updatedIdea.id,
+            title: updatedIdea.title,
+            description: updatedIdea.description,
+            tags: updatedIdea.tags,
+            category: updatedIdea.category,
+            priority: updatedIdea.priority,
+            status: updatedIdea.status as any,
+            techStack: updatedIdea.tech_stack,
+            aiSuggestions: updatedIdea.ai_suggestions,
+            createdAt: new Date(updatedIdea.created_at),
+            updatedAt: new Date(updatedIdea.updated_at),
+          }
+
+          set((state) => {
+            const updatedIdeas = state.ideas.map((idea) =>
+              idea.id === id ? frontendIdea : idea
+            )
+            return {
+              ideas: updatedIdeas,
+              filteredIdeas: state.applyFilters(updatedIdeas)
+            }
+          })
+        } catch (error) {
+          console.error('更新创意失败:', error)
+          set({ error: '更新创意失败' })
+        }
+      },
+
+      deleteIdea: async (id) => {
+        const auth = useAuth.getState()
+        if (!auth.session) {
+          set({ error: '用户未登录' })
+          return
+        }
+
+        set({ error: null })
+
+        try {
+          const response = await fetch(`/api/ideas/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${auth.session.access_token}`,
+            },
+          })
+
+          if (!response.ok) {
+            const error = await response.text()
+            throw new Error(error)
+          }
+
+          set((state) => {
+            const updatedIdeas = state.ideas.filter((idea) => idea.id !== id)
+            return {
+              ideas: updatedIdeas,
+              filteredIdeas: state.applyFilters(updatedIdeas)
+            }
+          })
+        } catch (error) {
+          console.error('删除创意失败:', error)
+          set({ error: '删除创意失败' })
+        }
       },
 
       getIdeaById: (id) => {
@@ -143,6 +319,8 @@ export const useCreativeIdeas = create<CreativeIdeasState>()(
           planning: ideas.filter((idea) => idea.status === 'planning').length,
         }
       },
+
+      clearError: () => set({ error: null }),
 
       // 内部筛选方法
       applyFilters: (ideas: CreativeIdea[]) => {

@@ -3,18 +3,28 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { Project, ProjectFilter, ProjectFormData, ProjectCategory, ProjectStatus } from '@/types/project'
+import { Project as DatabaseProject } from '@/types/database'
+import { useAuth } from './useAuth'
 
 interface ProjectStore {
   projects: Project[]
   filter: ProjectFilter
   isLoading: boolean
+  error: string | null
+  isSyncing: boolean
+  lastSyncTime: Date | null
+
+  // 云端同步操作
+  fetchProjects: () => Promise<void>
+  fetchFeaturedProjects: () => Promise<void>
+  syncProjects: () => Promise<void>
 
   // Actions
   setProjects: (projects: Project[]) => void
-  addProject: (project: ProjectFormData) => void
-  updateProject: (id: string, project: Partial<ProjectFormData>) => void
-  deleteProject: (id: string) => void
-  toggleFeatured: (id: string) => void
+  addProject: (project: ProjectFormData) => Promise<void>
+  updateProject: (id: string, project: Partial<ProjectFormData>) => Promise<void>
+  deleteProject: (id: string) => Promise<void>
+  toggleFeatured: (id: string) => Promise<void>
   setFilter: (filter: Partial<ProjectFilter>) => void
   clearFilter: () => void
 
@@ -31,6 +41,7 @@ interface ProjectStore {
     planning: number
     featured: number
   }
+  clearError: () => void
 }
 
 const generateId = () => Math.random().toString(36).substr(2, 9)
@@ -85,52 +96,267 @@ const sampleProjects: Project[] = [
 export const useProjects = create<ProjectStore>()(
   persist(
     (set, get) => ({
-      projects: sampleProjects,
+      projects: [],
       filter: {},
       isLoading: false,
+      error: null,
+      isSyncing: false,
+      lastSyncTime: null,
+
+      // 云端同步操作
+      fetchProjects: async () => {
+        const auth = useAuth.getState()
+        if (!auth.session) {
+          set({ error: '用户未登录' })
+          return
+        }
+
+        set({ isLoading: true, error: null })
+
+        try {
+          const response = await fetch('/api/projects', {
+            headers: {
+              'Authorization': `Bearer ${auth.session.access_token}`,
+            },
+          })
+
+          if (!response.ok) {
+            const error = await response.text()
+            throw new Error(error)
+          }
+
+          const projects: DatabaseProject[] = await response.json()
+
+          // 转换数据库格式到前端格式
+          const frontendProjects: Project[] = projects.map(project => ({
+            id: project.id,
+            title: project.title,
+            description: project.description,
+            content: project.content,
+            category: project.category as any,
+            tags: project.tags,
+            status: project.status as any,
+            technologies: project.technologies,
+            githubUrl: project.github_url,
+            demoUrl: project.demo_url,
+            imageUrl: project.image_url,
+            featured: project.featured,
+            createdAt: project.created_at,
+            updatedAt: project.updated_at,
+          }))
+
+          set({
+            projects: frontendProjects,
+            lastSyncTime: new Date()
+          })
+        } catch (error) {
+          console.error('获取项目列表失败:', error)
+          set({ error: '获取项目列表失败' })
+        } finally {
+          set({ isLoading: false })
+        }
+      },
+
+      fetchFeaturedProjects: async () => {
+        set({ isLoading: true, error: null })
+
+        try {
+          const response = await fetch('/api/projects?featured=true')
+
+          if (!response.ok) {
+            const error = await response.text()
+            throw new Error(error)
+          }
+
+          const projects: DatabaseProject[] = await response.json()
+
+          // 转换数据库格式到前端格式
+          const frontendProjects: Project[] = projects.map(project => ({
+            id: project.id,
+            title: project.title,
+            description: project.description,
+            content: project.content,
+            category: project.category as any,
+            tags: project.tags,
+            status: project.status as any,
+            technologies: project.technologies,
+            githubUrl: project.github_url,
+            demoUrl: project.demo_url,
+            imageUrl: project.image_url,
+            featured: project.featured,
+            createdAt: project.created_at,
+            updatedAt: project.updated_at,
+          }))
+
+          set({
+            projects: frontendProjects,
+            lastSyncTime: new Date()
+          })
+        } catch (error) {
+          console.error('获取精选项目失败:', error)
+          set({ error: '获取精选项目失败' })
+        } finally {
+          set({ isLoading: false })
+        }
+      },
+
+      syncProjects: async () => {
+        set({ isSyncing: true, error: null })
+        const auth = useAuth.getState()
+        if (auth.session) {
+          await get().fetchProjects()
+        } else {
+          await get().fetchFeaturedProjects()
+        }
+        set({ isSyncing: false })
+      },
 
       setProjects: (projects) => set({ projects }),
 
-      addProject: (projectData) => {
-        const newProject: Project = {
-          id: generateId(),
-          ...projectData,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+      addProject: async (projectData) => {
+        const auth = useAuth.getState()
+        if (!auth.session) {
+          set({ error: '用户未登录' })
+          return
         }
-        set((state) => ({
-          projects: [...state.projects, newProject],
-        }))
+
+        set({ error: null })
+
+        try {
+          const response = await fetch('/api/projects', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${auth.session.access_token}`,
+            },
+            body: JSON.stringify(projectData),
+          })
+
+          if (!response.ok) {
+            const error = await response.text()
+            throw new Error(error)
+          }
+
+          const newProject: DatabaseProject = await response.json()
+
+          // 转换为前端格式
+          const frontendProject: Project = {
+            id: newProject.id,
+            title: newProject.title,
+            description: newProject.description,
+            content: newProject.content,
+            category: newProject.category as any,
+            tags: newProject.tags,
+            status: newProject.status as any,
+            technologies: newProject.technologies,
+            githubUrl: newProject.github_url,
+            demoUrl: newProject.demo_url,
+            imageUrl: newProject.image_url,
+            featured: newProject.featured,
+            createdAt: newProject.created_at,
+            updatedAt: newProject.updated_at,
+          }
+
+          set((state) => ({
+            projects: [...state.projects, frontendProject],
+          }))
+        } catch (error) {
+          console.error('创建项目失败:', error)
+          set({ error: '创建项目失败' })
+        }
       },
 
-      updateProject: (id, projectData) => {
-        set((state) => ({
-          projects: state.projects.map((project) =>
-            project.id === id
-              ? {
-                  ...project,
-                  ...projectData,
-                  updatedAt: new Date().toISOString(),
-                }
-              : project
-          ),
-        }))
+      updateProject: async (id, projectData) => {
+        const auth = useAuth.getState()
+        if (!auth.session) {
+          set({ error: '用户未登录' })
+          return
+        }
+
+        set({ error: null })
+
+        try {
+          const response = await fetch(`/api/projects/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${auth.session.access_token}`,
+            },
+            body: JSON.stringify(projectData),
+          })
+
+          if (!response.ok) {
+            const error = await response.text()
+            throw new Error(error)
+          }
+
+          const updatedProject: DatabaseProject = await response.json()
+
+          // 转换为前端格式
+          const frontendProject: Project = {
+            id: updatedProject.id,
+            title: updatedProject.title,
+            description: updatedProject.description,
+            content: updatedProject.content,
+            category: updatedProject.category as any,
+            tags: updatedProject.tags,
+            status: updatedProject.status as any,
+            technologies: updatedProject.technologies,
+            githubUrl: updatedProject.github_url,
+            demoUrl: updatedProject.demo_url,
+            imageUrl: updatedProject.image_url,
+            featured: updatedProject.featured,
+            createdAt: updatedProject.created_at,
+            updatedAt: updatedProject.updated_at,
+          }
+
+          set((state) => ({
+            projects: state.projects.map((project) =>
+              project.id === id ? frontendProject : project
+            ),
+          }))
+        } catch (error) {
+          console.error('更新项目失败:', error)
+          set({ error: '更新项目失败' })
+        }
       },
 
-      deleteProject: (id) => {
-        set((state) => ({
-          projects: state.projects.filter((project) => project.id !== id),
-        }))
+      deleteProject: async (id) => {
+        const auth = useAuth.getState()
+        if (!auth.session) {
+          set({ error: '用户未登录' })
+          return
+        }
+
+        set({ error: null })
+
+        try {
+          const response = await fetch(`/api/projects/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${auth.session.access_token}`,
+            },
+          })
+
+          if (!response.ok) {
+            const error = await response.text()
+            throw new Error(error)
+          }
+
+          set((state) => ({
+            projects: state.projects.filter((project) => project.id !== id),
+          }))
+        } catch (error) {
+          console.error('删除项目失败:', error)
+          set({ error: '删除项目失败' })
+        }
       },
 
-      toggleFeatured: (id) => {
-        set((state) => ({
-          projects: state.projects.map((project) =>
-            project.id === id
-              ? { ...project, featured: !project.featured, updatedAt: new Date().toISOString() }
-              : project
-          ),
-        }))
+      toggleFeatured: async (id) => {
+        const project = get().projects.find(p => p.id === id)
+        if (!project) return
+
+        await get().updateProject(id, { featured: !project.featured })
       },
 
       setFilter: (newFilter) => {
@@ -195,6 +421,8 @@ export const useProjects = create<ProjectStore>()(
           featured: projects.filter(p => p.featured).length,
         }
       },
+
+      clearError: () => set({ error: null }),
     }),
     {
       name: 'projects-storage',

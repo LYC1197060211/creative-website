@@ -2,8 +2,9 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { GLMChatState, ChatMessage, ChatSession, ChatMessageInput } from '@/types/chat'
+import type { GLMChatState, ChatMessage, ChatSession } from '@/types/chat'
 
+// 临时的简化版本，聊天功能正在开发中
 export const useGLMChat = create<GLMChatState>()(
   persist(
     (set, get) => ({
@@ -33,7 +34,7 @@ export const useGLMChat = create<GLMChatState>()(
         return sessionId
       },
 
-      addMessage: (sessionId, message: ChatMessageInput): string => {
+      addMessage: (sessionId, message) => {
         const newMessageId = message.id ?? `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
         const timestamp = message.timestamp ?? new Date()
         const newMessage: ChatMessage = {
@@ -48,7 +49,6 @@ export const useGLMChat = create<GLMChatState>()(
               const updatedMessages = [...session.messages, newMessage]
               let title = session.title
 
-              // 如果是第一条用户消息，更新会话标题
               if (message.role === 'user' && session.messages.length === 0) {
                 title = message.content.slice(0, 30) + (message.content.length > 30 ? '...' : '')
               }
