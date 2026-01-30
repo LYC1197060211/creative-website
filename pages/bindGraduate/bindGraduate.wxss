@@ -48,9 +48,8 @@
   }
 }
 
-.logo {
-  width: 120rpx;
-  height: 120rpx;
+.logo-emoji {
+  font-size: 80rpx;
   position: relative;
   z-index: 1;
 }

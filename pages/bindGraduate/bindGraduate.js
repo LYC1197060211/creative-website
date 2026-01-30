@@ -31,8 +31,6 @@ Page({
     
     // 聚焦状态
     focusName: false,
-    focusGrade: false,
-    focusMajor: false,
     focusStudentId: false,
     focusPassword: false
   },
@@ -168,11 +166,14 @@ Page({
       grade: gradeList[gradeIndex],
       major: majorList[majorIndex],
       studentId: studentId.trim(),
-      password: password,
+      password: password.trim(),
       type: 'graduate' // 研究生类型
     };
 
-    console.log('提交数据：', submitData);
+    console.log('提交数据：', {
+      ...submitData,
+      password: '***' // 不记录密码
+    });
 
     // 模拟API请求
     setTimeout(() => {
@@ -224,9 +225,7 @@ Page({
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
-    wx.setNavigationBarTitle({
-      title: '研究生身份绑定'
-    });
+    // 页面渲染完成
   },
 
   /**

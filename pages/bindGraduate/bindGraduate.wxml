@@ -4,7 +4,7 @@
   <view class="header">
     <view class="logo-wrapper">
       <view class="logo-gradient"></view>
-      <image class="logo" src="/images/logo.png" mode="aspectFit"/>
+      <text class="logo-emoji">🎓</text>
     </view>
     <text class="title">身份绑定</text>
     <text class="subtitle">输入您的真实信息完成学生身份验证</text>
