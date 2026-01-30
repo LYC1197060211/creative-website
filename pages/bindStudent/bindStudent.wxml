@@ -1,0 +1,103 @@
+<!--pages/bindStudent/bindStudent.wxml-->
+<view class="container">
+  <!-- 顶部Logo和标题区域 -->
+  <view class="header">
+    <view class="logo-wrapper">
+      <view class="logo"></view>
+    </view>
+    <text class="title">身份绑定</text>
+    <text class="subtitle">输入您的真实信息完成学生身份验证</text>
+  </view>
+  
+  <!-- 表单区域 -->
+  <view class="form-section">
+    <!-- 真实姓名输入 -->
+    <view class="form-item">
+      <text class="label">真实姓名</text>
+      <view class="input-wrapper {{focusedField === 'name' ? 'input-focused' : ''}}">
+        <image class="input-icon" src="/images/icons/user.png" mode="aspectFit"></image>
+        <input 
+          class="input-field" 
+          placeholder="请输入您的姓名" 
+          placeholder-class="input-placeholder"
+          value="{{name}}"
+          bindinput="onNameInput"
+          bindfocus="onFocus"
+          bindblur="onBlur"
+          data-field="name"
+          maxlength="20"
+        />
+      </view>
+    </view>
+    
+    <!-- 年级选择器 -->
+    <view class="form-item">
+      <text class="label">年级</text>
+      <picker 
+        mode="selector" 
+        range="{{gradeList}}" 
+        value="{{gradeIndex}}"
+        bindchange="onGradeChange"
+      >
+        <view class="picker-wrapper {{gradeIndex >= 0 ? '' : 'picker-empty'}}">
+          <image class="input-icon" src="/images/icons/grade.png" mode="aspectFit"></image>
+          <text class="{{gradeIndex >= 0 ? 'picker-value' : 'picker-placeholder'}}">
+            {{gradeIndex >= 0 ? gradeList[gradeIndex] : '请选择您的年级'}}
+          </text>
+          <image class="arrow-icon" src="/images/icons/arrow-down.png" mode="aspectFit"></image>
+        </view>
+      </picker>
+    </view>
+    
+    <!-- 学号输入 -->
+    <view class="form-item">
+      <text class="label">学号</text>
+      <view class="input-wrapper {{focusedField === 'studentId' ? 'input-focused' : ''}}">
+        <image class="input-icon" src="/images/icons/id-card.png" mode="aspectFit"></image>
+        <input 
+          class="input-field" 
+          placeholder="请输入您的学号" 
+          placeholder-class="input-placeholder"
+          value="{{studentId}}"
+          bindinput="onStudentIdInput"
+          bindfocus="onFocus"
+          bindblur="onBlur"
+          data-field="studentId"
+          type="number"
+          maxlength="20"
+        />
+      </view>
+    </view>
+    
+    <!-- 密码输入 -->
+    <view class="form-item">
+      <text class="label">密码</text>
+      <view class="input-wrapper {{focusedField === 'password' ? 'input-focused' : ''}}">
+        <image class="input-icon" src="/images/icons/lock.png" mode="aspectFit"></image>
+        <input 
+          class="input-field" 
+          placeholder="请输入您的密码" 
+          placeholder-class="input-placeholder"
+          value="{{password}}"
+          bindinput="onPasswordInput"
+          bindfocus="onFocus"
+          bindblur="onBlur"
+          data-field="password"
+          password
+          maxlength="20"
+        />
+      </view>
+    </view>
+    
+    <!-- 提示文字 -->
+    <view class="tips-wrapper">
+      <text class="tips-icon">ℹ️</text>
+      <text class="tips-text">请确保您输入的信息真实有效，以便完成身份验证</text>
+    </view>
+  </view>
+  
+  <!-- 确认绑定按钮 -->
+  <button class="submit-btn {{canSubmit ? '' : 'submit-btn-disabled'}}" bindtap="onSubmit" disabled="{{!canSubmit}}">
+    <text class="btn-text">确认绑定</text>
+  </button>
+</view>
