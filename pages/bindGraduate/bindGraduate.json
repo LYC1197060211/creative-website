@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "研究生身份绑定",
+  "navigationBarBackgroundColor": "#1E5AA8",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#F8FAFC",
+  "enablePullDownRefresh": false,
+  "disableScroll": false,
+  "usingComponents": {}
+}

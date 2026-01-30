@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>研究生身份绑定 - 预览</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      background: linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .phone-frame {
+      width: 375px;
+      height: 812px;
+      background: #000;
+      border-radius: 40px;
+      padding: 12px;
+      box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        0 0 0 12px #1a1a1a,
+        0 0 0 14px #2a2a2a;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 30px;
+      background: #000;
+      border-radius: 0 0 20px 20px;
+      z-index: 10;
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
+      border-radius: 32px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .phone-screen::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .phone-screen::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+
+    .container {
+      padding: 20px 16px;
+      padding-top: 40px;
+    }
+
+    /* Header Styles */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .logo-wrapper {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 16px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-gradient {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+      border-radius: 50%;
+      box-shadow: 
+        0 4px 12px rgba(102, 126, 234, 0.3),
+        0 2px 6px rgba(118, 75, 162, 0.2);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.05);
+        opacity: 0.9;
+      }
+    }
+
+    .logo {
+      width: 60px;
+      height: 60px;
+      position: relative;
+      z-index: 1;
+      font-size: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1A1A2E;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #6B7280;
+      line-height: 1.5;
+    }
+
+    .badge {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 4px 12px;
+      background: linear-gradient(135deg, #D4A84B 0%, #F59E0B 100%);
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 16px;
+      box-shadow: 0 2px 6px rgba(212, 168, 75, 0.3);
+    }
+
+    /* Form Section */
+    .form-section {
+      background: #FFFFFF;
+      border-radius: 12px;
+      padding: 20px 16px;
+      box-shadow: 
+        0 1px 8px rgba(0, 0, 0, 0.04),
+        0 4px 16px rgba(0, 0, 0, 0.08);
+      margin-bottom: 16px;
+    }
+
+    .form-item {
+      margin-bottom: 16px;
+    }
+
+    .form-item:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Label Styles */
+    .label {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1A1A2E;
+      margin-bottom: 8px;
+    }
+
+    .label-icon {
+      font-size: 16px;
+      margin-right: 4px;
+      width: 16px;
+      text-align: center;
+    }
+
+    /* Input Wrapper */
+    .input-wrapper,
+    .picker-wrapper {
+      display: flex;
+      align-items: center;
+      background: #F1F5F9;
+      border-radius: 8px;
+      padding: 12px 10px;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .input-wrapper.focus,
+    .picker-wrapper.focus {
+      background: #FFFFFF;
+      border-color: #D4A84B;
+      box-shadow: 
+        0 0 0 3px rgba(212, 168, 75, 0.1),
+        0 2px 8px rgba(212, 168, 75, 0.15);
+    }
+
+    /* Icon Wrapper */
+    .input-icon-wrapper {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #D4A84B 0%, #F59E0B 100%);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+      flex-shrink: 0;
+      box-shadow: 0 1px 4px rgba(212, 168, 75, 0.25);
+    }
+
+    .input-icon {
+      font-size: 14px;
+    }
+
+    /* Input Field */
+    .input-field {
+      flex: 1;
+      font-size: 14px;
+      color: #1A1A2E;
+      border: none;
+      background: transparent;
+      outline: none;
+    }
+
+    .input-field::placeholder {
+      color: #9CA3AF;
+    }
+
+    /* Picker Styles */
+    .picker-value {
+      flex: 1;
+      font-size: 14px;
+      color: #1A1A2E;
+    }
+
+    .picker-placeholder {
+      flex: 1;
+      font-size: 14px;
+      color: #9CA3AF;
+    }
+
+    .arrow-icon {
+      font-size: 12px;
+      color: #D4A84B;
+      margin-left: 8px;
+      transition: transform 0.3s ease;
+    }
+
+    .picker-wrapper.open .arrow-icon {
+      transform: rotate(180deg);
+    }
+
+    /* Dropdown */
+    .picker-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: #FFFFFF;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      z-index: 100;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .picker-dropdown.show {
+      display: block;
+      animation: slideDown 0.2s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .picker-option {
+      padding: 12px 16px;
+      font-size: 14px;
+      color: #1A1A2E;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .picker-option:hover {
+      background: #F1F5F9;
+    }
+
+    .picker-option.selected {
+      background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+      color: #92400E;
+      font-weight: 600;
+    }
+
+    /* Tips Section */
+    .tips {
+      display: flex;
+      align-items: flex-start;
+      background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+      border-left: 2px solid #D4A84B;
+      padding: 10px 12px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 4px rgba(212, 168, 75, 0.1);
+    }
+
+    .tips-icon-wrapper {
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 6px;
+      flex-shrink: 0;
+    }
+
+    .tips-icon {
+      font-size: 14px;
+    }
+
+    .tips-text {
+      flex: 1;
+      font-size: 12px;
+      color: #92400E;
+      line-height: 1.6;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+      width: 100%;
+      height: 48px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .submit-btn.active {
+      background: linear-gradient(135deg, #D4A84B 0%, #F59E0B 100%);
+      color: #FFFFFF;
+      box-shadow: 
+        0 4px 12px rgba(212, 168, 75, 0.3),
+        0 2px 6px rgba(245, 158, 11, 0.2);
+    }
+
+    .submit-btn.active:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 6px 16px rgba(212, 168, 75, 0.4),
+        0 3px 8px rgba(245, 158, 11, 0.3);
+    }
+
+    .submit-btn.active:active {
+      transform: scale(0.98);
+    }
+
+    .submit-btn.disabled {
+      background: #E5E7EB;
+      color: #9CA3AF;
+      cursor: not-allowed;
+    }
+
+    .submit-btn-text {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Relative positioning for dropdown */
+    .form-item {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="phone-notch"></div>
+    <div class="phone-screen">
+      <div class="container">
+        <!-- Header -->
+        <div class="header">
+          <div class="logo-wrapper">
+            <div class="logo-gradient"></div>
+            <div class="logo">🎓</div>
+          </div>
+          <div class="title">身份绑定</div>
+          <div class="subtitle">输入您的真实信息完成学生身份验证</div>
+          <div class="badge">研究生</div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-section">
+          <!-- Name Input -->
+          <div class="form-item">
+            <div class="label">
+              <span class="label-icon">👤</span>
+              真实姓名
+            </div>
+            <div class="input-wrapper" id="name-wrapper">
+              <div class="input-icon-wrapper">
+                <span class="input-icon">📝</span>
+              </div>
+              <input 
+                type="text" 
+                class="input-field" 
+                id="name-input"
+                placeholder="请输入您的姓名"
+              />
+            </div>
+          </div>
+
+          <!-- Grade Picker -->
+          <div class="form-item">
+            <div class="label">
+              <span class="label-icon">📅</span>
+              年级
+            </div>
+            <div class="picker-wrapper" id="grade-picker">
+              <div class="input-icon-wrapper">
+                <span class="input-icon">🎓</span>
+              </div>
+              <span class="picker-placeholder" id="grade-text">请选择您的年级</span>
+              <span class="arrow-icon">▼</span>
+              <div class="picker-dropdown" id="grade-dropdown">
+                <div class="picker-option" data-value="0">22级</div>
+                <div class="picker-option" data-value="1">23级</div>
+                <div class="picker-option" data-value="2">24级</div>
+                <div class="picker-option" data-value="3">25级</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Major Picker -->
+          <div class="form-item">
+            <div class="label">
+              <span class="label-icon">📚</span>
+              专业
+            </div>
+            <div class="picker-wrapper" id="major-picker">
+              <div class="input-icon-wrapper">
+                <span class="input-icon">🔬</span>
+              </div>
+              <span class="picker-placeholder" id="major-text">请选择您的专业</span>
+              <span class="arrow-icon">▼</span>
+              <div class="picker-dropdown" id="major-dropdown">
+                <div class="picker-option" data-value="0">化学基础</div>
+                <div class="picker-option" data-value="1">分析化学</div>
+                <div class="picker-option" data-value="2">有机化学</div>
+                <div class="picker-option" data-value="3">无机化学</div>
+                <div class="picker-option" data-value="4">物理化学</div>
+                <div class="picker-option" data-value="5">高分子化学</div>
+                <div class="picker-option" data-value="6">材料化学</div>
+                <div class="picker-option" data-value="7">应用化学</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Student ID Input -->
+          <div class="form-item">
+            <div class="label">
+              <span class="label-icon">🎫</span>
+              学号
+            </div>
+            <div class="input-wrapper" id="student-id-wrapper">
+              <div class="input-icon-wrapper">
+                <span class="input-icon">🔢</span>
+              </div>
+              <input 
+                type="text" 
+                class="input-field" 
+                id="student-id-input"
+                placeholder="请输入您的学号"
+              />
+            </div>
+          </div>
+
+          <!-- Password Input -->
+          <div class="form-item">
+            <div class="label">
+              <span class="label-icon">🔒</span>
+              密码
+            </div>
+            <div class="input-wrapper" id="password-wrapper">
+              <div class="input-icon-wrapper">
+                <span class="input-icon">🔑</span>
+              </div>
+              <input 
+                type="password" 
+                class="input-field" 
+                id="password-input"
+                placeholder="请输入密码"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="tips">
+          <div class="tips-icon-wrapper">
+            <span class="tips-icon">ℹ️</span>
+          </div>
+          <div class="tips-text">请确保信息与辅导员导入的名单一致，否则无法完成绑定。</div>
+        </div>
+
+        <!-- Submit Button -->
+        <button class="submit-btn disabled" id="submit-btn">
+          <span class="submit-btn-text">确认绑定</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Form data
+    let formData = {
+      name: '',
+      gradeIndex: -1,
+      majorIndex: -1,
+      studentId: '',
+      password: ''
+    };
+
+    // Elements
+    const nameInput = document.getElementById('name-input');
+    const studentIdInput = document.getElementById('student-id-input');
+    const passwordInput = document.getElementById('password-input');
+    const submitBtn = document.getElementById('submit-btn');
+
+    const nameWrapper = document.getElementById('name-wrapper');
+    const studentIdWrapper = document.getElementById('student-id-wrapper');
+    const passwordWrapper = document.getElementById('password-wrapper');
+
+    const gradePicker = document.getElementById('grade-picker');
+    const gradeText = document.getElementById('grade-text');
+    const gradeDropdown = document.getElementById('grade-dropdown');
+
+    const majorPicker = document.getElementById('major-picker');
+    const majorText = document.getElementById('major-text');
+    const majorDropdown = document.getElementById('major-dropdown');
+
+    // Focus handlers for inputs
+    nameInput.addEventListener('focus', () => nameWrapper.classList.add('focus'));
+    nameInput.addEventListener('blur', () => nameWrapper.classList.remove('focus'));
+    studentIdInput.addEventListener('focus', () => studentIdWrapper.classList.add('focus'));
+    studentIdInput.addEventListener('blur', () => studentIdWrapper.classList.remove('focus'));
+    passwordInput.addEventListener('focus', () => passwordWrapper.classList.add('focus'));
+    passwordInput.addEventListener('blur', () => passwordWrapper.classList.remove('focus'));
+
+    // Input handlers
+    nameInput.addEventListener('input', (e) => {
+      formData.name = e.target.value;
+      validateForm();
+    });
+
+    studentIdInput.addEventListener('input', (e) => {
+      formData.studentId = e.target.value;
+      validateForm();
+    });
+
+    passwordInput.addEventListener('input', (e) => {
+      formData.password = e.target.value;
+      validateForm();
+    });
+
+    // Grade picker
+    gradePicker.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = gradeDropdown.classList.contains('show');
+      closeAllDropdowns();
+      if (!isOpen) {
+        gradeDropdown.classList.add('show');
+        gradePicker.classList.add('open', 'focus');
+      }
+    });
+
+    gradeDropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const option = e.target.closest('.picker-option');
+      if (option) {
+        const value = parseInt(option.dataset.value);
+        formData.gradeIndex = value;
+        gradeText.textContent = option.textContent;
+        gradeText.classList.remove('picker-placeholder');
+        gradeText.classList.add('picker-value');
+        
+        // Update selected state
+        gradeDropdown.querySelectorAll('.picker-option').forEach(opt => {
+          opt.classList.remove('selected');
+        });
+        option.classList.add('selected');
+        
+        closeAllDropdowns();
+        validateForm();
+      }
+    });
+
+    // Major picker
+    majorPicker.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = majorDropdown.classList.contains('show');
+      closeAllDropdowns();
+      if (!isOpen) {
+        majorDropdown.classList.add('show');
+        majorPicker.classList.add('open', 'focus');
+      }
+    });
+
+    majorDropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const option = e.target.closest('.picker-option');
+      if (option) {
+        const value = parseInt(option.dataset.value);
+        formData.majorIndex = value;
+        majorText.textContent = option.textContent;
+        majorText.classList.remove('picker-placeholder');
+        majorText.classList.add('picker-value');
+        
+        // Update selected state
+        majorDropdown.querySelectorAll('.picker-option').forEach(opt => {
+          opt.classList.remove('selected');
+        });
+        option.classList.add('selected');
+        
+        closeAllDropdowns();
+        validateForm();
+      }
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', () => {
+      closeAllDropdowns();
+    });
+
+    function closeAllDropdowns() {
+      gradeDropdown.classList.remove('show');
+      gradePicker.classList.remove('open', 'focus');
+      majorDropdown.classList.remove('show');
+      majorPicker.classList.remove('open', 'focus');
+    }
+
+    // Form validation
+    function validateForm() {
+      const isValid = 
+        formData.name.trim() !== '' &&
+        formData.gradeIndex >= 0 &&
+        formData.majorIndex >= 0 &&
+        formData.studentId.trim() !== '' &&
+        formData.password.trim() !== '';
+
+      if (isValid) {
+        submitBtn.classList.remove('disabled');
+        submitBtn.classList.add('active');
+      } else {
+        submitBtn.classList.remove('active');
+        submitBtn.classList.add('disabled');
+      }
+    }
+
+    // Submit handler
+    submitBtn.addEventListener('click', () => {
+      if (submitBtn.classList.contains('active')) {
+        alert('绑定成功！\n\n' +
+          '姓名：' + formData.name + '\n' +
+          '年级：' + gradeText.textContent + '\n' +
+          '专业：' + majorText.textContent + '\n' +
+          '学号：' + formData.studentId);
+      } else {
+        alert('请完整填写所有信息');
+      }
+    });
+  </script>
+</body>
+</html>

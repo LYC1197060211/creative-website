@@ -1,0 +1,318 @@
+/* 研究生身份绑定页面样式 */
+
+/* === 全局容器 === */
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
+  padding: 40rpx 32rpx;
+  box-sizing: border-box;
+}
+
+/* === 顶部区域 === */
+.header {
+  text-align: center;
+  margin-bottom: 48rpx;
+  position: relative;
+}
+
+.logo-wrapper {
+  width: 160rpx;
+  height: 160rpx;
+  margin: 0 auto 32rpx;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-gradient {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+  border-radius: 50%;
+  box-shadow: 
+    0 8rpx 24rpx rgba(102, 126, 234, 0.3),
+    0 4rpx 12rpx rgba(118, 75, 162, 0.2);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+.logo-emoji {
+  font-size: 80rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #1A1A2E;
+  margin-bottom: 16rpx;
+  letter-spacing: 2rpx;
+}
+
+.subtitle {
+  display: block;
+  font-size: 28rpx;
+  color: #6B7280;
+  line-height: 1.5;
+}
+
+.badge {
+  display: inline-block;
+  margin-top: 16rpx;
+  padding: 8rpx 24rpx;
+  background: linear-gradient(135deg, #D4A84B 0%, #F59E0B 100%);
+  color: #FFFFFF;
+  font-size: 24rpx;
+  font-weight: 600;
+  border-radius: 32rpx;
+  box-shadow: 0 4rpx 12rpx rgba(212, 168, 75, 0.3);
+}
+
+/* === 表单区域 === */
+.form-section {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 40rpx 32rpx;
+  box-shadow: 
+    0 2rpx 16rpx rgba(0, 0, 0, 0.04),
+    0 8rpx 32rpx rgba(0, 0, 0, 0.08);
+  margin-bottom: 32rpx;
+}
+
+.form-item {
+  margin-bottom: 32rpx;
+}
+
+.form-item:last-child {
+  margin-bottom: 0;
+}
+
+/* === 标签样式 === */
+.label {
+  display: flex;
+  align-items: center;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A2E;
+  margin-bottom: 16rpx;
+}
+
+.label-icon {
+  font-size: 32rpx;
+  margin-right: 8rpx;
+  display: inline-block;
+  width: 32rpx;
+  text-align: center;
+}
+
+/* === 输入框包装器 === */
+.input-wrapper,
+.picker-wrapper {
+  display: flex;
+  align-items: center;
+  background: #F1F5F9;
+  border-radius: 16rpx;
+  padding: 24rpx 20rpx;
+  transition: all 0.3s ease;
+  border: 2rpx solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.input-wrapper::before,
+.picker-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #D4A84B 0%, #F59E0B 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+}
+
+.input-focus {
+  background: #FFFFFF;
+  border-color: #D4A84B;
+  box-shadow: 
+    0 0 0 4rpx rgba(212, 168, 75, 0.1),
+    0 4rpx 16rpx rgba(212, 168, 75, 0.15);
+}
+
+.input-focus::before {
+  opacity: 0.03;
+}
+
+/* === 图标包装器 === */
+.input-icon-wrapper {
+  width: 48rpx;
+  height: 48rpx;
+  background: linear-gradient(135deg, #D4A84B 0%, #F59E0B 100%);
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+  box-shadow: 0 2rpx 8rpx rgba(212, 168, 75, 0.25);
+  position: relative;
+  z-index: 1;
+}
+
+.input-icon {
+  font-size: 28rpx;
+}
+
+/* === 输入框 === */
+.input-field {
+  flex: 1;
+  font-size: 28rpx;
+  color: #1A1A2E;
+  position: relative;
+  z-index: 1;
+}
+
+.input-placeholder {
+  color: #9CA3AF;
+  font-size: 28rpx;
+}
+
+/* === 选择器样式 === */
+.picker-value {
+  flex: 1;
+  font-size: 28rpx;
+  color: #1A1A2E;
+  position: relative;
+  z-index: 1;
+}
+
+.picker-placeholder {
+  flex: 1;
+  font-size: 28rpx;
+  color: #9CA3AF;
+  position: relative;
+  z-index: 1;
+}
+
+.arrow-icon {
+  font-size: 24rpx;
+  color: #D4A84B;
+  margin-left: 16rpx;
+  transition: transform 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.picker-wrapper:active .arrow-icon {
+  transform: rotate(180deg);
+}
+
+/* === 提示信息 === */
+.tips {
+  display: flex;
+  align-items: flex-start;
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  border-left: 4rpx solid #D4A84B;
+  padding: 20rpx 24rpx;
+  border-radius: 12rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 2rpx 8rpx rgba(212, 168, 75, 0.1);
+}
+
+.tips-icon-wrapper {
+  width: 36rpx;
+  height: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12rpx;
+  flex-shrink: 0;
+}
+
+.tips-icon {
+  font-size: 28rpx;
+}
+
+.tips-text {
+  flex: 1;
+  font-size: 24rpx;
+  color: #92400E;
+  line-height: 1.6;
+}
+
+/* === 提交按钮 === */
+.submit-btn {
+  width: 100%;
+  height: 96rpx;
+  border-radius: 16rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.submit-btn::after {
+  border: none;
+}
+
+.submit-btn-active {
+  background: linear-gradient(135deg, #D4A84B 0%, #F59E0B 100%);
+  color: #FFFFFF;
+  box-shadow: 
+    0 8rpx 24rpx rgba(212, 168, 75, 0.3),
+    0 4rpx 12rpx rgba(245, 158, 11, 0.2);
+}
+
+.submit-btn-active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.submit-btn-active:active {
+  transform: scale(0.98);
+  box-shadow: 
+    0 4rpx 16rpx rgba(212, 168, 75, 0.2),
+    0 2rpx 8rpx rgba(245, 158, 11, 0.15);
+}
+
+.submit-btn-active:active::before {
+  left: 100%;
+}
+
+.submit-btn-disabled {
+  background: #E5E7EB;
+  color: #9CA3AF;
+  box-shadow: none;
+}
+
+.submit-btn-text {
+  position: relative;
+  z-index: 1;
+}

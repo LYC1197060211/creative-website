@@ -1,0 +1,138 @@
+<!-- 研究生身份绑定页面 -->
+<view class="container">
+  <!-- 顶部Logo和标题 -->
+  <view class="header">
+    <view class="logo-wrapper">
+      <view class="logo-gradient"></view>
+      <text class="logo-emoji">🎓</text>
+    </view>
+    <text class="title">身份绑定</text>
+    <text class="subtitle">输入您的真实信息完成学生身份验证</text>
+    <view class="badge">研究生</view>
+  </view>
+  
+  <!-- 表单区域 -->
+  <view class="form-section">
+    <!-- 姓名输入框 -->
+    <view class="form-item">
+      <text class="label">
+        <text class="label-icon">👤</text>
+        真实姓名
+      </text>
+      <view class="input-wrapper {{focusName ? 'input-focus' : ''}}">
+        <view class="input-icon-wrapper">
+          <text class="input-icon">📝</text>
+        </view>
+        <input 
+          class="input-field" 
+          placeholder="请输入您的姓名" 
+          placeholder-class="input-placeholder"
+          value="{{name}}"
+          bindinput="onNameInput"
+          bindfocus="onNameFocus"
+          bindblur="onNameBlur"
+        />
+      </view>
+    </view>
+    
+    <!-- 年级选择器 -->
+    <view class="form-item">
+      <text class="label">
+        <text class="label-icon">📅</text>
+        年级
+      </text>
+      <picker mode="selector" range="{{gradeList}}" value="{{gradeIndex}}" bindchange="onGradeChange">
+        <view class="picker-wrapper">
+          <view class="input-icon-wrapper">
+            <text class="input-icon">🎓</text>
+          </view>
+          <text class="{{gradeIndex >= 0 ? 'picker-value' : 'picker-placeholder'}}">
+            {{gradeIndex >= 0 ? gradeList[gradeIndex] : '请选择您的年级'}}
+          </text>
+          <text class="arrow-icon">▼</text>
+        </view>
+      </picker>
+    </view>
+    
+    <!-- 专业选择器 -->
+    <view class="form-item">
+      <text class="label">
+        <text class="label-icon">📚</text>
+        专业
+      </text>
+      <picker mode="selector" range="{{majorList}}" value="{{majorIndex}}" bindchange="onMajorChange">
+        <view class="picker-wrapper">
+          <view class="input-icon-wrapper">
+            <text class="input-icon">🔬</text>
+          </view>
+          <text class="{{majorIndex >= 0 ? 'picker-value' : 'picker-placeholder'}}">
+            {{majorIndex >= 0 ? majorList[majorIndex] : '请选择您的专业'}}
+          </text>
+          <text class="arrow-icon">▼</text>
+        </view>
+      </picker>
+    </view>
+    
+    <!-- 学号输入框 -->
+    <view class="form-item">
+      <text class="label">
+        <text class="label-icon">🎫</text>
+        学号
+      </text>
+      <view class="input-wrapper {{focusStudentId ? 'input-focus' : ''}}">
+        <view class="input-icon-wrapper">
+          <text class="input-icon">🔢</text>
+        </view>
+        <input 
+          class="input-field" 
+          placeholder="请输入您的学号" 
+          placeholder-class="input-placeholder"
+          value="{{studentId}}"
+          bindinput="onStudentIdInput"
+          bindfocus="onStudentIdFocus"
+          bindblur="onStudentIdBlur"
+        />
+      </view>
+    </view>
+    
+    <!-- 密码输入框 -->
+    <view class="form-item">
+      <text class="label">
+        <text class="label-icon">🔒</text>
+        密码
+      </text>
+      <view class="input-wrapper {{focusPassword ? 'input-focus' : ''}}">
+        <view class="input-icon-wrapper">
+          <text class="input-icon">🔑</text>
+        </view>
+        <input 
+          class="input-field" 
+          type="password"
+          placeholder="请输入密码" 
+          placeholder-class="input-placeholder"
+          value="{{password}}"
+          bindinput="onPasswordInput"
+          bindfocus="onPasswordFocus"
+          bindblur="onPasswordBlur"
+        />
+      </view>
+    </view>
+  </view>
+  
+  <!-- 提示信息 -->
+  <view class="tips">
+    <view class="tips-icon-wrapper">
+      <text class="tips-icon">ℹ️</text>
+    </view>
+    <text class="tips-text">请确保信息与辅导员导入的名单一致，否则无法完成绑定。</text>
+  </view>
+  
+  <!-- 提交按钮 -->
+  <button 
+    class="submit-btn {{isFormValid ? 'submit-btn-active' : 'submit-btn-disabled'}}" 
+    disabled="{{!isFormValid}}" 
+    bindtap="onSubmit"
+  >
+    <text class="submit-btn-text">确认绑定</text>
+  </button>
+</view>
