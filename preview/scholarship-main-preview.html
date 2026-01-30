@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>奖学金评选系统 - 预览</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: #E5E7EB;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .phone-frame {
+      width: 375px;
+      background: #000;
+      border-radius: 40px;
+      padding: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 667px;
+      background: #F8FAFC;
+      border-radius: 28px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .container {
+      padding: 8px;
+      padding-bottom: 100px;
+    }
+
+    /* 卡片样式 - Soft UI */
+    .info-card,
+    .section-card {
+      background: #FFFFFF;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 8px;
+      box-shadow: 0 4px 12px rgba(30, 90, 168, 0.08),
+                  0 1px 4px rgba(30, 90, 168, 0.04);
+    }
+
+    /* 卡片标题 */
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .icon-circle {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #667EEA 0%, #1E5AA8 100%);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+      margin-right: 8px;
+    }
+
+    .header-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1E293B;
+    }
+
+    /* 表单元素 */
+    .info-row,
+    .form-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .info-label,
+    .form-label {
+      width: 100px;
+      font-size: 14px;
+      color: #64748B;
+    }
+
+    .info-input,
+    .form-input,
+    .form-select {
+      flex: 1;
+      height: 36px;
+      background: #F8FAFC;
+      border-radius: 6px;
+      padding: 0 10px;
+      font-size: 14px;
+      color: #1E293B;
+      border: 1px solid #E2E8F0;
+      outline: none;
+    }
+
+    .form-select {
+      cursor: pointer;
+    }
+
+    /* 分数显示 */
+    .score-highlight {
+      margin-top: 12px;
+      padding: 12px;
+      background: linear-gradient(135deg, #667EEA 0%, #1E5AA8 100%);
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+    }
+
+    .score-label {
+      font-size: 14px;
+      color: #FFFFFF;
+      font-weight: 500;
+    }
+
+    .score-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .result-box {
+      margin-top: 12px;
+      padding: 10px;
+      background: #F1F5F9;
+      border-radius: 6px;
+      border-left: 3px solid #667EEA;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .result-text {
+      font-size: 13px;
+      color: #64748B;
+      margin-right: 4px;
+    }
+
+    .result-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1E5AA8;
+    }
+
+    .note-text {
+      font-size: 12px;
+      color: #EF4444;
+      margin-left: 4px;
+    }
+
+    /* 上传按钮 */
+    .upload-section {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .upload-btn {
+      background: #F8FAFC;
+      border: 1px dashed #CBD5E1;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #64748B;
+      padding: 8px 16px;
+      cursor: pointer;
+    }
+
+    .upload-hint {
+      margin-left: 8px;
+      font-size: 12px;
+      color: #10B981;
+    }
+
+    /* 子模块 */
+    .subsection {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #E2E8F0;
+    }
+
+    .subsection:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .subsection-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .subsection-title span {
+      font-size: 14px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .add-btn {
+      background: linear-gradient(135deg, #667EEA 0%, #1E5AA8 100%);
+      color: #FFFFFF;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 10px;
+      border: none;
+      box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+      cursor: pointer;
+    }
+
+    /* 列表项 */
+    .item-list {
+      margin-top: 8px;
+    }
+
+    .list-item {
+      background: #F8FAFC;
+      border-radius: 6px;
+      padding: 8px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #E2E8F0;
+    }
+
+    .item-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .item-select {
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      color: #334155;
+      min-width: 80px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .item-select-full {
+      flex: 1;
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      color: #334155;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .item-score {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1E5AA8;
+      margin-left: 4px;
+    }
+
+    .delete-btn {
+      background: #FEE2E2;
+      color: #EF4444;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: none;
+      margin-left: 4px;
+      cursor: pointer;
+    }
+
+    /* 素质类总分 */
+    .quality-total {
+      margin-top: 16px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(30, 90, 168, 0.1) 100%);
+      border-left-color: #1E5AA8;
+    }
+
+    /* 底部操作区 */
+    .bottom-section {
+      position: fixed;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      background: #FFFFFF;
+      padding: 12px 16px;
+      border-radius: 16px;
+      box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+      z-index: 100;
+    }
+
+    .total-score-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: linear-gradient(135deg, #667EEA 0%, #1E5AA8 100%);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+    }
+
+    .total-label {
+      font-size: 14px;
+      color: #FFFFFF;
+      font-weight: 500;
+    }
+
+    .total-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    /* 按钮组 */
+    .button-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      flex: 1;
+      height: 44px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(135deg, #667EEA 0%, #1E5AA8 100%);
+      color: #FFFFFF;
+      box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+    }
+
+    .action-btn.secondary {
+      background: #F1F5F9;
+      color: #64748B;
+      border: 1px solid #CBD5E1;
+    }
+
+    .action-btn:active {
+      transform: translateY(1px);
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <div class="container" id="app">
+        <!-- 顶部信息展示区 -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="icon-circle">👤</div>
+            <span class="header-title">学生信息</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">姓名：</span>
+            <input class="info-input" placeholder="请输入姓名" id="name">
+          </div>
+          <div class="info-row">
+            <span class="info-label">年级：</span>
+            <input class="info-input" placeholder="请输入年级" id="grade">
+          </div>
+          <div class="info-row">
+            <span class="info-label">学号：</span>
+            <input class="info-input" placeholder="请输入学号" id="studentId">
+          </div>
+          <div class="score-highlight">
+            <span class="score-label">综合评定成绩</span>
+            <span class="score-value" id="totalScoreTop">0.00</span>
+          </div>
+        </div>
+
+        <!-- 学业成绩模块 -->
+        <div class="section-card">
+          <div class="card-header">
+            <div class="icon-circle">📚</div>
+            <span class="header-title">学业成绩</span>
+          </div>
+          <div class="form-row">
+            <span class="form-label">学分数：</span>
+            <input class="form-input" type="number" placeholder="请输入学分数" id="credits">
+          </div>
+          <div class="form-row">
+            <span class="form-label">平均绩点(GPA)：</span>
+            <input class="form-input" type="number" step="0.01" placeholder="请输入GPA" id="gpa">
+          </div>
+          <div class="result-box">
+            <span class="result-text">学业成绩 = GPA × 20 = </span>
+            <span class="result-value" id="academicScore">0.00</span>
+          </div>
+        </div>
+
+        <!-- 学生工作加分模块 -->
+        <div class="section-card">
+          <div class="card-header">
+            <div class="icon-circle">🎯</div>
+            <span class="header-title">学生工作加分</span>
+          </div>
+          <div class="form-row">
+            <span class="form-label">职务：</span>
+            <select class="form-select" id="workPosition">
+              <option value="0">无</option>
+              <option value="1">学生会主席团成员</option>
+              <option value="2">学生会部长/主要班委/社团社长/党支部支委</option>
+              <option value="3">学生会副部长/社团副社长</option>
+              <option value="4">其他班委/其他学生干部</option>
+              <option value="5">参与志愿服务（待审核认定）</option>
+            </select>
+          </div>
+          <div class="upload-section">
+            <button class="upload-btn" onclick="uploadProof()">📎 上传证明材料</button>
+            <span class="upload-hint" id="uploadHint" style="display: none;">✓ 已上传</span>
+          </div>
+          <div class="result-box">
+            <span class="result-text">学生工作加分：</span>
+            <span class="result-value" id="workScore">0</span>
+            <span class="note-text" id="workNote" style="display: none;">（需辅导员审核）</span>
+          </div>
+        </div>
+
+        <!-- 素质类加分模块 -->
+        <div class="section-card">
+          <div class="card-header">
+            <div class="icon-circle">🏆</div>
+            <span class="header-title">素质类加分</span>
+          </div>
+
+          <!-- 学科竞赛/创新创业 -->
+          <div class="subsection">
+            <div class="subsection-title">
+              <span>学科竞赛/创新创业</span>
+              <button class="add-btn" onclick="addCompetition()">+ 添加</button>
+            </div>
+            <div class="item-list" id="competitionList"></div>
+          </div>
+
+          <!-- 文体比赛 -->
+          <div class="subsection">
+            <div class="subsection-title">
+              <span>文体比赛</span>
+              <button class="add-btn" onclick="addSports()">+ 添加</button>
+            </div>
+            <div class="item-list" id="sportsList"></div>
+          </div>
+
+          <!-- 荣誉称号 -->
+          <div class="subsection">
+            <div class="subsection-title">
+              <span>荣誉称号</span>
+              <button class="add-btn" onclick="addHonor()">+ 添加</button>
+            </div>
+            <div class="item-list" id="honorList"></div>
+          </div>
+
+          <!-- 书院/学院活动 -->
+          <div class="subsection">
+            <div class="subsection-title">
+              <span>书院/学院活动</span>
+              <button class="add-btn" onclick="addCampus()">+ 添加</button>
+            </div>
+            <div class="item-list" id="campusList"></div>
+          </div>
+
+          <!-- 学术成果 -->
+          <div class="subsection">
+            <div class="subsection-title">
+              <span>学术成果</span>
+              <button class="add-btn" onclick="addAchievement()">+ 添加</button>
+            </div>
+            <div class="item-list" id="achievementList"></div>
+          </div>
+
+          <!-- 科创项目 -->
+          <div class="subsection">
+            <div class="subsection-title">
+              <span>科创项目</span>
+              <button class="add-btn" onclick="addProject()">+ 添加</button>
+            </div>
+            <div class="item-list" id="projectList"></div>
+          </div>
+
+          <!-- 其他 -->
+          <div class="subsection">
+            <div class="subsection-title">
+              <span>其他</span>
+              <button class="add-btn" onclick="addOther()">+ 添加</button>
+            </div>
+            <div class="item-list" id="otherList"></div>
+          </div>
+
+          <div class="result-box quality-total">
+            <span class="result-text">素质类加分总计：</span>
+            <span class="result-value" id="qualityScore">0.00</span>
+          </div>
+        </div>
+
+        <!-- 底部操作区 -->
+        <div class="bottom-section">
+          <div class="total-score-card">
+            <span class="total-label">综合评定成绩总分</span>
+            <span class="total-value" id="totalScoreBottom">0.00</span>
+          </div>
+          <div class="button-group">
+            <button class="action-btn secondary" onclick="saveDraft()">保存草稿</button>
+            <button class="action-btn primary" onclick="submitApplication()">提交申请</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 数据存储
+    let state = {
+      academicScore: 0,
+      workScore: 0,
+      qualityScore: 0,
+      totalScore: 0,
+      competitions: [],
+      sports: [],
+      honors: [],
+      campus: [],
+      achievements: [],
+      projects: [],
+      others: []
+    };
+
+    // 学业成绩计算
+    document.getElementById('gpa').addEventListener('input', (e) => {
+      const gpa = parseFloat(e.target.value) || 0;
+      state.academicScore = gpa * 20;
+      document.getElementById('academicScore').textContent = state.academicScore.toFixed(2);
+      updateTotalScore();
+    });
+
+    // 学生工作职务选择
+    document.getElementById('workPosition').addEventListener('change', (e) => {
+      const scores = [0, 1.0, 0.8, 0.6, 0.5, 0.5];
+      const index = parseInt(e.target.value);
+      state.workScore = scores[index];
+      document.getElementById('workScore').textContent = state.workScore;
+      document.getElementById('workNote').style.display = index === 5 ? 'inline' : 'none';
+      updateTotalScore();
+    });
+
+    // 上传证明
+    function uploadProof() {
+      document.getElementById('uploadHint').style.display = 'inline';
+      alert('上传成功');
+    }
+
+    // 学科竞赛
+    function addCompetition() {
+      state.competitions.push({ level: 0, grade: 0, score: 5 });
+      renderCompetitions();
+    }
+
+    function renderCompetitions() {
+      const list = document.getElementById('competitionList');
+      list.innerHTML = state.competitions.map((item, idx) => `
+        <div class="list-item">
+          <div class="item-content">
+            <select class="item-select" onchange="updateCompetition(${idx}, 'level', this.value)">
+              <option value="0" ${item.level === 0 ? 'selected' : ''}>国家级</option>
+              <option value="1" ${item.level === 1 ? 'selected' : ''}>省市级</option>
+              <option value="2" ${item.level === 2 ? 'selected' : ''}>校级</option>
+            </select>
+            <select class="item-select" onchange="updateCompetition(${idx}, 'grade', this.value)">
+              <option value="0" ${item.grade === 0 ? 'selected' : ''}>一等</option>
+              <option value="1" ${item.grade === 1 ? 'selected' : ''}>二等</option>
+              <option value="2" ${item.grade === 2 ? 'selected' : ''}>三等</option>
+              <option value="3" ${item.grade === 3 ? 'selected' : ''}>四等</option>
+            </select>
+            <span class="item-score">${item.score}分</span>
+          </div>
+          <button class="delete-btn" onclick="deleteCompetition(${idx})">删除</button>
+        </div>
+      `).join('');
+      updateQualityScore();
+    }
+
+    function updateCompetition(idx, field, value) {
+      const val = parseInt(value);
+      state.competitions[idx][field] = val;
+      const scoreTable = [
+        [5, 4, 3, 2],
+        [4, 3, 2, 1],
+        [1.5, 1, 0.5, 0]
+      ];
+      state.competitions[idx].score = scoreTable[state.competitions[idx].level][state.competitions[idx].grade];
+      renderCompetitions();
+    }
+
+    function deleteCompetition(idx) {
+      state.competitions.splice(idx, 1);
+      renderCompetitions();
+    }
+
+    // 文体比赛
+    function addSports() {
+      state.sports.push({ level: 0, grade: 0, score: 3 });
+      renderSports();
+    }
+
+    function renderSports() {
+      const list = document.getElementById('sportsList');
+      list.innerHTML = state.sports.map((item, idx) => `
+        <div class="list-item">
+          <div class="item-content">
+            <select class="item-select" onchange="updateSports(${idx}, 'level', this.value)">
+              <option value="0" ${item.level === 0 ? 'selected' : ''}>国家级</option>
+              <option value="1" ${item.level === 1 ? 'selected' : ''}>省市级</option>
+              <option value="2" ${item.level === 2 ? 'selected' : ''}>校级</option>
+            </select>
+            <select class="item-select" onchange="updateSports(${idx}, 'grade', this.value)">
+              <option value="0" ${item.grade === 0 ? 'selected' : ''}>一等</option>
+              <option value="1" ${item.grade === 1 ? 'selected' : ''}>二等</option>
+              <option value="2" ${item.grade === 2 ? 'selected' : ''}>三等</option>
+              <option value="3" ${item.grade === 3 ? 'selected' : ''}>集体奖</option>
+            </select>
+            <span class="item-score">${item.score}分</span>
+          </div>
+          <button class="delete-btn" onclick="deleteSports(${idx})">删除</button>
+        </div>
+      `).join('');
+      updateQualityScore();
+    }
+
+    function updateSports(idx, field, value) {
+      const val = parseInt(value);
+      state.sports[idx][field] = val;
+      const scoreTable = [
+        [3, 2, 1, 0.3],
+        [2, 1, 0.5, 0.2],
+        [1, 0.5, 0.3, 0.1]
+      ];
+      state.sports[idx].score = scoreTable[state.sports[idx].level][state.sports[idx].grade];
+      renderSports();
+    }
+
+    function deleteSports(idx) {
+      state.sports.splice(idx, 1);
+      renderSports();
+    }
+
+    // 荣誉称号
+    function addHonor() {
+      state.honors.push({ level: 0, score: 5 });
+      renderHonors();
+    }
+
+    function renderHonors() {
+      const list = document.getElementById('honorList');
+      list.innerHTML = state.honors.map((item, idx) => `
+        <div class="list-item">
+          <div class="item-content">
+            <select class="item-select-full" onchange="updateHonor(${idx}, this.value)">
+              <option value="0" ${item.level === 0 ? 'selected' : ''}>国家级(5分)</option>
+              <option value="1" ${item.level === 1 ? 'selected' : ''}>省市级(3分)</option>
+              <option value="2" ${item.level === 2 ? 'selected' : ''}>校级(1分)</option>
+              <option value="3" ${item.level === 3 ? 'selected' : ''}>院级(0.5分)</option>
+            </select>
+            <span class="item-score">${item.score}分</span>
+          </div>
+          <button class="delete-btn" onclick="deleteHonor(${idx})">删除</button>
+        </div>
+      `).join('');
+      updateQualityScore();
+    }
+
+    function updateHonor(idx, value) {
+      const scores = [5, 3, 1, 0.5];
+      state.honors[idx].level = parseInt(value);
+      state.honors[idx].score = scores[state.honors[idx].level];
+      renderHonors();
+    }
+
+    function deleteHonor(idx) {
+      state.honors.splice(idx, 1);
+      renderHonors();
+    }
+
+    // 书院/学院活动
+    function addCampus() {
+      state.campus.push({ type: 0, score: 0.3 });
+      renderCampus();
+    }
+
+    function renderCampus() {
+      const list = document.getElementById('campusList');
+      list.innerHTML = state.campus.map((item, idx) => `
+        <div class="list-item">
+          <div class="item-content">
+            <select class="item-select-full" onchange="updateCampus(${idx}, this.value)">
+              <option value="0" ${item.type === 0 ? 'selected' : ''}>第二课堂活动-一等奖(0.3)</option>
+              <option value="1" ${item.type === 1 ? 'selected' : ''}>第二课堂活动-二等奖(0.2)</option>
+              <option value="2" ${item.type === 2 ? 'selected' : ''}>第二课堂活动-三等奖(0.1)</option>
+              <option value="3" ${item.type === 3 ? 'selected' : ''}>优秀志愿者(0.1)</option>
+            </select>
+            <span class="item-score">${item.score}分</span>
+          </div>
+          <button class="delete-btn" onclick="deleteCampus(${idx})">删除</button>
+        </div>
+      `).join('');
+      updateQualityScore();
+    }
+
+    function updateCampus(idx, value) {
+      const scores = [0.3, 0.2, 0.1, 0.1];
+      state.campus[idx].type = parseInt(value);
+      state.campus[idx].score = scores[state.campus[idx].type];
+      renderCampus();
+    }
+
+    function deleteCampus(idx) {
+      state.campus.splice(idx, 1);
+      renderCampus();
+    }
+
+    // 学术成果
+    function addAchievement() {
+      state.achievements.push({ type: 0, author: 0, score: 3 });
+      renderAchievements();
+    }
+
+    function renderAchievements() {
+      const list = document.getElementById('achievementList');
+      list.innerHTML = state.achievements.map((item, idx) => `
+        <div class="list-item">
+          <div class="item-content">
+            <select class="item-select" onchange="updateAchievement(${idx}, 'type', this.value)">
+              <option value="0" ${item.type === 0 ? 'selected' : ''}>SCI研究性/发明专利</option>
+              <option value="1" ${item.type === 1 ? 'selected' : ''}>SCI综述性</option>
+              <option value="2" ${item.type === 2 ? 'selected' : ''}>其他学术</option>
+            </select>
+            <select class="item-select" onchange="updateAchievement(${idx}, 'author', this.value)">
+              <option value="0" ${item.author === 0 ? 'selected' : ''}>第一作者</option>
+              <option value="1" ${item.author === 1 ? 'selected' : ''}>第二作者</option>
+            </select>
+            <span class="item-score">${item.score}分</span>
+          </div>
+          <button class="delete-btn" onclick="deleteAchievement(${idx})">删除</button>
+        </div>
+      `).join('');
+      updateQualityScore();
+    }
+
+    function updateAchievement(idx, field, value) {
+      const val = parseInt(value);
+      state.achievements[idx][field] = val;
+      const scoreTable = [
+        [3, 1.5],
+        [2, 1],
+        [1, 0]
+      ];
+      state.achievements[idx].score = scoreTable[state.achievements[idx].type][state.achievements[idx].author];
+      renderAchievements();
+    }
+
+    function deleteAchievement(idx) {
+      state.achievements.splice(idx, 1);
+      renderAchievements();
+    }
+
+    // 科创项目
+    function addProject() {
+      state.projects.push({ type: 0, role: 0, score: 1 });
+      renderProjects();
+    }
+
+    function renderProjects() {
+      const list = document.getElementById('projectList');
+      list.innerHTML = state.projects.map((item, idx) => `
+        <div class="list-item">
+          <div class="item-content">
+            <select class="item-select" onchange="updateProject(${idx}, 'type', this.value)">
+              <option value="0" ${item.type === 0 ? 'selected' : ''}>国家级项目</option>
+              <option value="1" ${item.type === 1 ? 'selected' : ''}>上海市项目</option>
+              <option value="2" ${item.type === 2 ? 'selected' : ''}>校级/大夏基金</option>
+              <option value="3" ${item.type === 3 ? 'selected' : ''}>师范生研习</option>
+            </select>
+            <select class="item-select" onchange="updateProject(${idx}, 'role', this.value)">
+              <option value="0" ${item.role === 0 ? 'selected' : ''}>负责人</option>
+              <option value="1" ${item.role === 1 ? 'selected' : ''}>组员</option>
+            </select>
+            <span class="item-score">${item.score}分</span>
+          </div>
+          <button class="delete-btn" onclick="deleteProject(${idx})">删除</button>
+        </div>
+      `).join('');
+      updateQualityScore();
+    }
+
+    function updateProject(idx, field, value) {
+      const val = parseInt(value);
+      state.projects[idx][field] = val;
+      const scoreTable = [
+        [1, 0.8],
+        [0.8, 0.6],
+        [0.6, 0.4],
+        [0.4, 0.2]
+      ];
+      state.projects[idx].score = scoreTable[state.projects[idx].type][state.projects[idx].role];
+      renderProjects();
+    }
+
+    function deleteProject(idx) {
+      state.projects.splice(idx, 1);
+      renderProjects();
+    }
+
+    // 其他
+    function addOther() {
+      state.others.push({ type: 0, score: 0.3 });
+      renderOthers();
+    }
+
+    function renderOthers() {
+      const list = document.getElementById('otherList');
+      list.innerHTML = state.others.map((item, idx) => `
+        <div class="list-item">
+          <div class="item-content">
+            <select class="item-select-full" onchange="updateOther(${idx}, this.value)">
+              <option value="0" ${item.type === 0 ? 'selected' : ''}>义务献血(0.3)</option>
+            </select>
+            <span class="item-score">${item.score}分</span>
+          </div>
+          <button class="delete-btn" onclick="deleteOther(${idx})">删除</button>
+        </div>
+      `).join('');
+      updateQualityScore();
+    }
+
+    function updateOther(idx, value) {
+      state.others[idx].type = parseInt(value);
+      state.others[idx].score = 0.3;
+      renderOthers();
+    }
+
+    function deleteOther(idx) {
+      state.others.splice(idx, 1);
+      renderOthers();
+    }
+
+    // 更新素质类总分
+    function updateQualityScore() {
+      let total = 0;
+      state.competitions.forEach(item => total += item.score);
+      state.sports.forEach(item => total += item.score);
+      state.honors.forEach(item => total += item.score);
+      state.campus.forEach(item => total += item.score);
+      state.achievements.forEach(item => total += item.score);
+      state.projects.forEach(item => total += item.score);
+      state.others.forEach(item => total += item.score);
+      
+      state.qualityScore = total;
+      document.getElementById('qualityScore').textContent = total.toFixed(2);
+      updateTotalScore();
+    }
+
+    // 更新总分
+    function updateTotalScore() {
+      state.totalScore = state.academicScore + state.workScore + state.qualityScore;
+      const totalStr = state.totalScore.toFixed(2);
+      document.getElementById('totalScoreTop').textContent = totalStr;
+      document.getElementById('totalScoreBottom').textContent = totalStr;
+    }
+
+    // 保存草稿
+    function saveDraft() {
+      alert('草稿已保存');
+    }
+
+    // 提交申请
+    function submitApplication() {
+      const name = document.getElementById('name').value;
+      const grade = document.getElementById('grade').value;
+      const studentId = document.getElementById('studentId').value;
+      const gpa = document.getElementById('gpa').value;
+
+      if (!name || !grade || !studentId) {
+        alert('请完善学生信息');
+        return;
+      }
+
+      if (!gpa) {
+        alert('请输入GPA');
+        return;
+      }
+
+      if (confirm(`综合评定成绩：${state.totalScore.toFixed(2)}分\n确认提交申请？`)) {
+        alert('提交成功');
+      }
+    }
+  </script>
+</body>
+</html>
