@@ -1,0 +1,41 @@
+.select-picker {
+  width: 100%;
+}
+
+.select-display {
+  width: 100%;
+  padding: 24rpx 32rpx;
+  border: 4rpx solid #e5e7eb;
+  border-radius: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  box-sizing: border-box;
+  transition: all 0.3s;
+}
+
+.select-display.has-value {
+  border-color: #8B5CF6;
+  background: #faf5ff;
+}
+
+.select-text {
+  font-size: 32rpx;
+  color: #374151;
+  flex: 1;
+}
+
+.select-display:not(.has-value) .select-text {
+  color: #9ca3af;
+}
+
+.select-arrow {
+  width: 32rpx;
+  height: 32rpx;
+  transition: transform 0.3s;
+}
+
+.picker-trigger {
+  display: none;
+}

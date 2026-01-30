@@ -1,0 +1,12 @@
+<view class="upload-box">
+  <view class="upload-area {{imageUrl ? 'has-image' : ''}}" bindtap="chooseImage">
+    <image wx:if="{{imageUrl}}" class="upload-preview" src="{{imageUrl}}" mode="aspectFill"></image>
+    <view wx:else class="upload-placeholder">
+      <image class="upload-icon" src="/images/upload.png" mode="aspectFit"></image>
+      <text class="upload-text">{{placeholder}}</text>
+    </view>
+  </view>
+  <view wx:if="{{imageUrl}}" class="upload-actions">
+    <button class="btn-remove" size="mini" bindtap="removeImage">删除</button>
+  </view>
+</view>

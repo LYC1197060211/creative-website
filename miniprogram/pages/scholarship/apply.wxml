@@ -1,0 +1,180 @@
+<view class="container">
+  <view class="header">
+    <text class="header-title">🎓 奖学金申请</text>
+    <text class="header-subtitle">完整填写各项内容，系统将自动计算总分</text>
+  </view>
+
+  <!-- 分数汇总 -->
+  <view class="score-summary">
+    <view class="score-title">总分</view>
+    <view class="score-value">{{totalScore}}</view>
+    <view class="score-subtitle">综合素质测评成绩</view>
+    <view class="score-breakdown">
+      <view class="score-item">
+        <text class="score-item-label">学业成绩</text>
+        <text class="score-item-value">{{academicScore}}</text>
+      </view>
+      <view class="score-item">
+        <text class="score-item-label">综合表现</text>
+        <text class="score-item-value">{{comprehensiveScore}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 1. 学业成绩 -->
+  <view class="card">
+    <view class="section-title">学业成绩</view>
+    <view class="input-group">
+      <text class="input-label">GPA（4.0制）</text>
+      <input class="input-field" type="digit" placeholder="请输入GPA" value="{{gpa}}" bindinput="onGpaInput" />
+      <text class="info-text">学业成绩分 = GPA × 20</text>
+    </view>
+    <view class="input-group">
+      <text class="input-label">学业成绩分</text>
+      <input class="input-field" type="digit" disabled placeholder="自动计算" value="{{gpaScore}}" />
+    </view>
+  </view>
+
+  <!-- 2. 学生工作 -->
+  <view class="card">
+    <view class="section-title">学生工作</view>
+    <view class="input-group">
+      <text class="input-label">选择职位</text>
+      <picker mode="selector" range="{{studentWorkOptions}}" value="{{studentWorkIndex}}" bindchange="onStudentWorkChange">
+        <view class="picker-display">
+          <text class="{{studentWork ? 'picker-text' : 'picker-placeholder'}}">{{studentWork || '请选择'}}</text>
+        </view>
+      </picker>
+    </view>
+    <view wx:if="{{studentWork}}" class="input-group">
+      <text class="input-label">上传证明材料</text>
+      <upload-box placeholder="点击上传图片" imageUrl="{{studentWorkImage}}" bind:change="onStudentWorkImageChange" bind:remove="onStudentWorkImageRemove"></upload-box>
+    </view>
+  </view>
+
+  <!-- 3. 学科竞赛 -->
+  <view class="card">
+    <view class="section-title">学科竞赛</view>
+    <view class="item-list">
+      <view class="item-card" wx:for="{{competitions}}" wx:key="index">
+        <view class="item-card-header">
+          <view class="item-card-left">
+            <text class="item-card-title">{{item.name}}</text>
+            <text class="item-card-desc">{{item.level}} {{item.rank}}</text>
+          </view>
+          <text class="item-card-score">+{{item.score}}</text>
+        </view>
+        <button class="btn-delete" size="mini" bindtap="deleteCompetition" data-index="{{index}}">删除</button>
+      </view>
+    </view>
+    <button class="btn-add" bindtap="addCompetition">+ 添加学科竞赛</button>
+  </view>
+
+  <!-- 4. 文体比赛 -->
+  <view class="card">
+    <view class="section-title">文体比赛</view>
+    <view class="item-list">
+      <view class="item-card" wx:for="{{sports}}" wx:key="index">
+        <view class="item-card-header">
+          <view class="item-card-left">
+            <text class="item-card-title">{{item.name}}</text>
+            <text class="item-card-desc">{{item.level}} {{item.rank}}</text>
+          </view>
+          <text class="item-card-score">+{{item.score}}</text>
+        </view>
+        <button class="btn-delete" size="mini" bindtap="deleteSports" data-index="{{index}}">删除</button>
+      </view>
+    </view>
+    <button class="btn-add" bindtap="addSports">+ 添加文体比赛</button>
+  </view>
+
+  <!-- 5. 荣誉称号 -->
+  <view class="card">
+    <view class="section-title">荣誉称号</view>
+    <view class="item-list">
+      <view class="item-card" wx:for="{{honors}}" wx:key="index">
+        <view class="item-card-header">
+          <view class="item-card-left">
+            <text class="item-card-title">{{item.name}}</text>
+            <text class="item-card-desc">{{item.level}}</text>
+          </view>
+          <text class="item-card-score">+{{item.score}}</text>
+        </view>
+        <button class="btn-delete" size="mini" bindtap="deleteHonor" data-index="{{index}}">删除</button>
+      </view>
+    </view>
+    <button class="btn-add" bindtap="addHonor">+ 添加荣誉称号</button>
+  </view>
+
+  <!-- 6. 书院活动 -->
+  <view class="card">
+    <view class="section-title">书院活动</view>
+    <view class="item-list">
+      <view class="item-card" wx:for="{{activities}}" wx:key="index">
+        <view class="item-card-header">
+          <view class="item-card-left">
+            <text class="item-card-title">{{item.name}}</text>
+            <text class="item-card-desc">{{item.award}}</text>
+          </view>
+          <text class="item-card-score">+{{item.score}}</text>
+        </view>
+        <button class="btn-delete" size="mini" bindtap="deleteActivity" data-index="{{index}}">删除</button>
+      </view>
+    </view>
+    <button class="btn-add" bindtap="addActivity">+ 添加书院活动</button>
+  </view>
+
+  <!-- 7. 学术成果 -->
+  <view class="card">
+    <view class="section-title">学术成果</view>
+    <view class="item-list">
+      <view class="item-card" wx:for="{{academicResults}}" wx:key="index">
+        <view class="item-card-header">
+          <view class="item-card-left">
+            <text class="item-card-title">{{item.title}}</text>
+            <text class="item-card-desc">{{item.type}} - {{item.ranking}}</text>
+          </view>
+          <text class="item-card-score">+{{item.score}}</text>
+        </view>
+        <button class="btn-delete" size="mini" bindtap="deleteAcademicResult" data-index="{{index}}">删除</button>
+      </view>
+    </view>
+    <button class="btn-add" bindtap="addAcademicResult">+ 添加学术成果</button>
+  </view>
+
+  <!-- 8. 科创项目 -->
+  <view class="card">
+    <view class="section-title">科创项目</view>
+    <view class="item-list">
+      <view class="item-card" wx:for="{{projects}}" wx:key="index">
+        <view class="item-card-header">
+          <view class="item-card-left">
+            <text class="item-card-title">{{item.name}}</text>
+            <text class="item-card-desc">{{item.type}} - {{item.role}}</text>
+          </view>
+          <text class="item-card-score">+{{item.score}}</text>
+        </view>
+        <button class="btn-delete" size="mini" bindtap="deleteProject" data-index="{{index}}">删除</button>
+      </view>
+    </view>
+    <button class="btn-add" bindtap="addProject">+ 添加科创项目</button>
+  </view>
+
+  <!-- 9. 义务献血 -->
+  <view class="card">
+    <view class="section-title">义务献血</view>
+    <view class="checkbox-group">
+      <checkbox checked="{{bloodDonation}}" bindtap="toggleBloodDonation" />
+      <text class="checkbox-label">我参加过义务献血 (+0.3分)</text>
+    </view>
+    <view wx:if="{{bloodDonation}}" class="input-group" style="margin-top: 32rpx;">
+      <text class="input-label">上传献血证明</text>
+      <upload-box placeholder="点击上传图片" imageUrl="{{bloodDonationImage}}" bind:change="onBloodDonationImageChange" bind:remove="onBloodDonationImageRemove"></upload-box>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-section">
+    <button class="submit-btn" bindtap="submitForm">提交申请</button>
+  </view>
+</view>

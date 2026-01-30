@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "奖学金申请",
+  "navigationBarBackgroundColor": "#6366F1",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#667eea",
+  "usingComponents": {
+    "upload-box": "../../components/upload-box/index"
+  }
+}
