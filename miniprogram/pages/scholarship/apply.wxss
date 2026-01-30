@@ -1,0 +1,284 @@
+page {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 48rpx 32rpx;
+  box-sizing: border-box;
+}
+
+.container {
+  width: 100%;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  color: white;
+  margin-bottom: 64rpx;
+}
+
+.header-title {
+  font-size: 64rpx;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.header-subtitle {
+  font-size: 32rpx;
+  opacity: 0.9;
+  display: block;
+}
+
+/* Score Summary */
+.score-summary {
+  background: linear-gradient(135deg, #6366F1, #8B5CF6);
+  border-radius: 48rpx;
+  padding: 48rpx;
+  color: white;
+  text-align: center;
+  margin-bottom: 32rpx;
+  box-shadow: 0 16rpx 64rpx rgba(0, 0, 0, 0.1);
+}
+
+.score-title {
+  font-size: 48rpx;
+  font-weight: 600;
+  margin-bottom: 32rpx;
+}
+
+.score-value {
+  font-size: 96rpx;
+  font-weight: 700;
+  margin-bottom: 16rpx;
+}
+
+.score-subtitle {
+  font-size: 32rpx;
+  opacity: 0.9;
+}
+
+.score-breakdown {
+  display: flex;
+  gap: 32rpx;
+  margin-top: 48rpx;
+}
+
+.score-item {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 32rpx;
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.score-item-label {
+  font-size: 28rpx;
+  opacity: 0.9;
+}
+
+.score-item-value {
+  font-size: 48rpx;
+  font-weight: 700;
+}
+
+/* Card */
+.card {
+  background: white;
+  border-radius: 48rpx;
+  padding: 48rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 16rpx 64rpx rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 32rpx;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.section-title::before {
+  content: '';
+  width: 8rpx;
+  height: 40rpx;
+  background: linear-gradient(135deg, #6366F1, #8B5CF6);
+  border-radius: 4rpx;
+}
+
+/* Input Group */
+.input-group {
+  margin-bottom: 32rpx;
+}
+
+.input-group:last-child {
+  margin-bottom: 0;
+}
+
+.input-label {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 16rpx;
+}
+
+.input-field {
+  width: 100%;
+  padding: 24rpx 32rpx;
+  border: 4rpx solid #e5e7eb;
+  border-radius: 32rpx;
+  font-size: 32rpx;
+  background: white;
+  box-sizing: border-box;
+}
+
+.input-field[disabled] {
+  background: #f9fafb;
+  color: #6b7280;
+}
+
+.info-text {
+  display: block;
+  font-size: 24rpx;
+  color: #6b7280;
+  margin-top: 16rpx;
+}
+
+/* Picker */
+.picker-display {
+  width: 100%;
+  padding: 24rpx 32rpx;
+  border: 4rpx solid #e5e7eb;
+  border-radius: 32rpx;
+  background: white;
+  box-sizing: border-box;
+}
+
+.picker-text {
+  font-size: 32rpx;
+  color: #374151;
+}
+
+.picker-placeholder {
+  font-size: 32rpx;
+  color: #9ca3af;
+}
+
+/* Checkbox */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 24rpx;
+  background: #f9fafb;
+  border-radius: 24rpx;
+}
+
+.checkbox-label {
+  font-size: 32rpx;
+  color: #374151;
+  font-weight: 500;
+}
+
+/* Item List */
+.item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.item-card {
+  background: #f9fafb;
+  border-radius: 32rpx;
+  padding: 32rpx;
+  position: relative;
+}
+
+.item-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.item-card-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.item-card-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.item-card-desc {
+  font-size: 28rpx;
+  color: #6b7280;
+}
+
+.item-card-score {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #8B5CF6;
+  margin-left: 16rpx;
+}
+
+.btn-delete {
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 16rpx;
+  padding: 12rpx 24rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  margin-top: 16rpx;
+}
+
+/* Add Button */
+.btn-add {
+  width: 100%;
+  padding: 32rpx;
+  border: 4rpx dashed #d1d5db;
+  background: #f9fafb;
+  color: #6b7280;
+  border-radius: 32rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+}
+
+.btn-add::before {
+  content: none;
+}
+
+/* Submit Section */
+.submit-section {
+  margin-top: 64rpx;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 32rpx;
+  background: linear-gradient(135deg, #6366F1, #8B5CF6);
+  color: white;
+  border: none;
+  border-radius: 32rpx;
+  font-size: 36rpx;
+  font-weight: 600;
+  box-shadow: 0 8rpx 32rpx rgba(139, 92, 246, 0.3);
+}
+
+.submit-btn::after {
+  border: none;
+}

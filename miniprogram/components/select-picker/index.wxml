@@ -1,0 +1,17 @@
+<view class="select-picker" bindtap="onPickerTap">
+  <view class="select-display {{value ? 'has-value' : ''}}">
+    <text class="select-text">{{displayText}}</text>
+    <image class="select-arrow" src="/images/arrow-down.png" mode="aspectFit"></image>
+  </view>
+</view>
+
+<picker
+  wx:if="{{mode === 'selector'}}"
+  mode="selector"
+  range="{{options}}"
+  value="{{selectedIndex}}"
+  bindchange="onPickerChange"
+  hidden
+>
+  <view class="picker-trigger"></view>
+</picker>
