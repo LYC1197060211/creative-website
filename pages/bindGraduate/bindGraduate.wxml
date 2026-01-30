@@ -42,7 +42,7 @@
         年级
       </text>
       <picker mode="selector" range="{{gradeList}}" value="{{gradeIndex}}" bindchange="onGradeChange">
-        <view class="picker-wrapper {{focusGrade ? 'input-focus' : ''}}">
+        <view class="picker-wrapper">
           <view class="input-icon-wrapper">
             <text class="input-icon">🎓</text>
           </view>
@@ -61,7 +61,7 @@
         专业
       </text>
       <picker mode="selector" range="{{majorList}}" value="{{majorIndex}}" bindchange="onMajorChange">
-        <view class="picker-wrapper {{focusMajor ? 'input-focus' : ''}}">
+        <view class="picker-wrapper">
           <view class="input-icon-wrapper">
             <text class="input-icon">🔬</text>
           </view>

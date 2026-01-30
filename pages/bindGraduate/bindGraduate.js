@@ -69,7 +69,6 @@ Page({
       gradeIndex: index
     });
     this.validateForm();
-    console.log('选择年级：', this.data.gradeList[index]);
   },
 
   /**
@@ -81,7 +80,6 @@ Page({
       majorIndex: index
     });
     this.validateForm();
-    console.log('选择专业：', this.data.majorList[index]);
   },
 
   /**

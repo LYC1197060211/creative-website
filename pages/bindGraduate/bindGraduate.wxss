@@ -194,11 +194,6 @@
 }
 
 /* === 选择器样式 === */
-.picker-wrapper {
-  cursor: pointer;
-  user-select: none;
-}
-
 .picker-value {
   flex: 1;
   font-size: 28rpx;
@@ -320,23 +315,4 @@
 .submit-btn-text {
   position: relative;
   z-index: 1;
-}
-
-/* === 响应式优化 === */
-@media (max-width: 375px) {
-  .container {
-    padding: 32rpx 24rpx;
-  }
-  
-  .form-section {
-    padding: 32rpx 24rpx;
-  }
-  
-  .title {
-    font-size: 44rpx;
-  }
-  
-  .subtitle {
-    font-size: 26rpx;
-  }
 }
