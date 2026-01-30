@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>奖学金申请系统 - 主界面预览</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .phone-frame {
+      width: 375px;
+      height: 812px;
+      background: #f5f7fa;
+      border-radius: 32px;
+      box-shadow: 0 50px 100px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 180px;
+      height: 28px;
+      background: #000;
+      border-radius: 0 0 16px 16px;
+      z-index: 1000;
+    }
+
+    .app-container {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 80px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .app-container::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .app-container::-webkit-scrollbar-thumb {
+      background: rgba(102, 126, 234, 0.3);
+      border-radius: 2px;
+    }
+
+    /* User Info Card */
+    .user-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 40px 16px 24px;
+      color: white;
+      margin-top: 28px;
+    }
+
+    .user-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .user-name {
+      font-size: 20px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .user-info {
+      font-size: 14px;
+      text-align: center;
+      opacity: 0.9;
+    }
+
+    /* Module Card */
+    .module-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      margin: 8px 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .module-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .module-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+      color: #667eea;
+    }
+
+    .module-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a202c;
+      flex: 1;
+    }
+
+    .module-score {
+      font-size: 18px;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-label {
+      font-size: 14px;
+      color: #4a5568;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #f7fafc;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    /* Select Dropdown */
+    .select-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .select-display {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #f7fafc;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .select-display:hover {
+      border-color: #667eea;
+    }
+
+    .select-arrow {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.2s;
+    }
+
+    .select-wrapper.active .select-arrow {
+      transform: rotate(180deg);
+    }
+
+    .select-options {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      margin-top: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+      z-index: 10;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .select-wrapper.active .select-options {
+      display: block;
+    }
+
+    .select-option {
+      padding: 12px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .select-option:hover {
+      background: #f7fafc;
+    }
+
+    .select-option.selected {
+      background: #eef2ff;
+      color: #667eea;
+    }
+
+    /* Button */
+    .btn {
+      padding: 12px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #f7fafc;
+      color: #667eea;
+      border: 1px solid #e2e8f0;
+    }
+
+    .btn-add {
+      width: 100%;
+      background: #f7fafc;
+      color: #667eea;
+      border: 1px dashed #cbd5e0;
+    }
+
+    .btn-add:hover {
+      background: #eef2ff;
+      border-color: #667eea;
+    }
+
+    /* Item List */
+    .item-list {
+      margin-top: 12px;
+    }
+
+    .item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: #f7fafc;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .item-info {
+      flex: 1;
+    }
+
+    .item-title {
+      font-size: 14px;
+      color: #1a202c;
+      margin-bottom: 2px;
+    }
+
+    .item-detail {
+      font-size: 12px;
+      color: #718096;
+    }
+
+    .item-score {
+      font-size: 16px;
+      font-weight: 600;
+      color: #667eea;
+      margin-right: 8px;
+    }
+
+    .item-remove {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #fee;
+      color: #e53e3e;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    /* Checkbox */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      background: #f7fafc;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    .checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #cbd5e0;
+      border-radius: 4px;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .checkbox-group input:checked ~ .checkbox {
+      background: #667eea;
+      border-color: #667eea;
+    }
+
+    .checkbox-group input {
+      display: none;
+    }
+
+    .checkbox-label {
+      flex: 1;
+      font-size: 14px;
+      color: #1a202c;
+    }
+
+    .checkbox-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    /* Bottom Action Bar */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      padding: 16px;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .total-score-wrapper {
+      flex: 1;
+    }
+
+    .total-label {
+      font-size: 12px;
+      color: #718096;
+      margin-bottom: 2px;
+    }
+
+    .total-score {
+      font-size: 24px;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .btn-submit {
+      flex: 1;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      width: calc(100% - 48px);
+      max-width: 343px;
+      max-height: 80vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      padding: 16px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a202c;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: #f7fafc;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: #718096;
+    }
+
+    .modal-body {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-footer {
+      padding: 16px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      gap: 8px;
+    }
+
+    .modal-footer .btn {
+      flex: 1;
+    }
+
+    /* Cascader */
+    .cascader-option {
+      padding: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cascader-option:last-child {
+      border-bottom: none;
+    }
+
+    .cascader-option:hover {
+      background: #f7fafc;
+    }
+
+    .cascader-arrow {
+      width: 16px;
+      height: 16px;
+      color: #cbd5e0;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 24px;
+      color: #a0aec0;
+      font-size: 14px;
+    }
+
+    /* Success toast */
+    .toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+      z-index: 200;
+    }
+
+    .toast.active {
+      display: block;
+      animation: fadeInOut 2s ease-in-out;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0; }
+      10%, 90% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="phone-notch"></div>
+
+    <div class="app-container">
+      <!-- User Info Card -->
+      <div class="user-card">
+        <div class="user-avatar">
+          <svg class="module-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="user-name">张三</div>
+        <div class="user-info">计算机学院 · 2023级本科生</div>
+      </div>
+
+      <!-- Academic Performance Module -->
+      <div class="module-card">
+        <div class="module-header">
+          <svg class="module-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+          </svg>
+          <span class="module-title">学业成绩</span>
+          <span class="module-score" id="gradeScore">0.0分</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">平均绩点 (GPA)</label>
+          <input type="number" class="form-input" id="gpaInput" placeholder="请输入平均绩点" step="0.01" min="0" max="5">
+        </div>
+        <div style="font-size: 12px; color: #718096; margin-top: 4px;">
+          计算公式：平均绩点 × 20
+        </div>
+      </div>
+
+      <!-- Student Work Module -->
+      <div class="module-card">
+        <div class="module-header">
+          <svg class="module-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+          <span class="module-title">学生工作加分</span>
+          <span class="module-score" id="workScore">0.0分</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">选择职务（仅计最高项）</label>
+          <div class="select-wrapper" id="workSelect">
+            <div class="select-display">
+              <span id="workSelectText">请选择职务</span>
+              <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+            <div class="select-options">
+              <div class="select-option" data-value="0" data-label="不选择">不选择</div>
+              <div class="select-option" data-value="1.0" data-label="学生会主席团成员">学生会主席团成员 (1.0分)</div>
+              <div class="select-option" data-value="0.8" data-label="学生会部长/主要班委/社团社长">学生会部长/主要班委/社团社长 (0.8分)</div>
+              <div class="select-option" data-value="0.6" data-label="学生会副部长/社团副社长">学生会副部长/社团副社长 (0.6分)</div>
+              <div class="select-option" data-value="0.5" data-label="其他班委/其他学生干部">其他班委/其他学生干部 (0.5分)</div>
+              <div class="select-option" data-value="0.5" data-label="志愿服务">志愿服务 (0.1-1.0分，待审核)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quality Bonus Module -->
+      <div class="module-card">
+        <div class="module-header">
+          <svg class="module-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          <span class="module-title">素质类加分</span>
+          <span class="module-score" id="qualityScore">0.0分</span>
+        </div>
+        <button class="btn btn-add" id="addQualityBtn">
+          <span>+ 添加素质类加分项</span>
+        </button>
+        <div class="item-list" id="qualityList"></div>
+      </div>
+
+      <!-- Academic Achievement Module -->
+      <div class="module-card">
+        <div class="module-header">
+          <svg class="module-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          <span class="module-title">学术成果</span>
+          <span class="module-score" id="academicScore">0.0分</span>
+        </div>
+        <button class="btn btn-add" id="addAcademicBtn">
+          <span>+ 添加学术成果</span>
+        </button>
+        <div class="item-list" id="academicList"></div>
+      </div>
+
+      <!-- Research Project Module -->
+      <div class="module-card">
+        <div class="module-header">
+          <svg class="module-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v6m0 6v6m5.66-13.66l-4.24 4.24m0 6.36l4.24 4.24M23 12h-6m-6 0H1m18.66 5.66l-4.24-4.24m0-6.36l4.24-4.24"/>
+          </svg>
+          <span class="module-title">科创项目</span>
+          <span class="module-score" id="projectScore">0.0分</span>
+        </div>
+        <button class="btn btn-add" id="addProjectBtn">
+          <span>+ 添加科创项目</span>
+        </button>
+        <div class="item-list" id="projectList"></div>
+      </div>
+
+      <!-- Other Bonus Module -->
+      <div class="module-card">
+        <div class="module-header">
+          <svg class="module-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          <span class="module-title">其他加分</span>
+          <span class="module-score" id="otherScore">0.0分</span>
+        </div>
+        <label class="checkbox-group">
+          <input type="checkbox" id="bloodDonation" data-value="0.3">
+          <div class="checkbox">
+            <svg style="width: 12px; height: 12px; color: white; display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <span class="checkbox-label">义务献血</span>
+          <span class="checkbox-value">+0.3分</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Bottom Action Bar -->
+    <div class="bottom-bar">
+      <div class="total-score-wrapper">
+        <div class="total-label">总分</div>
+        <div class="total-score" id="totalScore">0.0</div>
+      </div>
+      <button class="btn btn-primary btn-submit" id="submitBtn">提交申请</button>
+    </div>
+  </div>
+
+  <!-- Quality Modal -->
+  <div class="modal-overlay" id="qualityModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">添加素质类加分</div>
+        <button class="modal-close" onclick="closeModal('qualityModal')">×</button>
+      </div>
+      <div class="modal-body" id="qualityModalBody">
+        <div class="cascader-option" onclick="showQualitySubType('competition')">
+          <span>学科竞赛</span>
+          <svg class="cascader-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>
+        <div class="cascader-option" onclick="showQualitySubType('sports')">
+          <span>文体比赛</span>
+          <svg class="cascader-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>
+        <div class="cascader-option" onclick="showQualitySubType('honor')">
+          <span>荣誉称号</span>
+          <svg class="cascader-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quality Sub Type Modal -->
+  <div class="modal-overlay" id="qualitySubModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="qualitySubTitle">选择级别</div>
+        <button class="modal-close" onclick="closeModal('qualitySubModal')">×</button>
+      </div>
+      <div class="modal-body" id="qualitySubBody"></div>
+    </div>
+  </div>
+
+  <!-- Academic Modal -->
+  <div class="modal-overlay" id="academicModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">添加学术成果</div>
+        <button class="modal-close" onclick="closeModal('academicModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="cascader-option" onclick="addAcademicItem('SCI研究性论文/专利', '第一作者', 3)">
+          <span>SCI研究性论文/专利 - 第一作者 (3分)</span>
+        </div>
+        <div class="cascader-option" onclick="addAcademicItem('SCI研究性论文/专利', '第二作者', 1.5)">
+          <span>SCI研究性论文/专利 - 第二作者 (1.5分)</span>
+        </div>
+        <div class="cascader-option" onclick="addAcademicItem('SCI综述性论文', '第一作者', 2)">
+          <span>SCI综述性论文 - 第一作者 (2分)</span>
+        </div>
+        <div class="cascader-option" onclick="addAcademicItem('SCI综述性论文', '第二作者', 1)">
+          <span>SCI综述性论文 - 第二作者 (1分)</span>
+        </div>
+        <div class="cascader-option" onclick="addAcademicItem('其他论文', '第一作者', 1)">
+          <span>其他论文 - 第一作者 (1分)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Modal -->
+  <div class="modal-overlay" id="projectModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">添加科创项目</div>
+        <button class="modal-close" onclick="closeModal('projectModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="cascader-option" onclick="showProjectRole('国家级')">
+          <span>国家级</span>
+          <svg class="cascader-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>
+        <div class="cascader-option" onclick="showProjectRole('上海市级')">
+          <span>上海市级</span>
+          <svg class="cascader-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>
+        <div class="cascader-option" onclick="showProjectRole('校级')">
+          <span>校级</span>
+          <svg class="cascader-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>
+        <div class="cascader-option" onclick="showProjectRole('师范生研习')">
+          <span>师范生研习</span>
+          <svg class="cascader-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Role Modal -->
+  <div class="modal-overlay" id="projectRoleModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="projectRoleTitle">选择角色</div>
+        <button class="modal-close" onclick="closeModal('projectRoleModal')">×</button>
+      </div>
+      <div class="modal-body" id="projectRoleBody"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Data structures
+    const qualityItems = [];
+    const academicItems = [];
+    const projectItems = [];
+    
+    // Score calculation
+    let scores = {
+      grade: 0,
+      work: 0,
+      quality: 0,
+      academic: 0,
+      project: 0,
+      other: 0
+    };
+
+    // Quality bonus data
+    const qualityData = {
+      competition: {
+        title: '学科竞赛',
+        levels: {
+          '国家级': { '一等奖': 5, '二等奖': 4, '三等奖': 3, '四等奖': 2 },
+          '省市级': { '一等奖': 4, '二等奖': 3, '三等奖': 2, '四等奖': 1 },
+          '校级': { '一等奖': 1.5, '二等奖': 1, '三等奖': 0.5 }
+        }
+      },
+      sports: {
+        title: '文体比赛',
+        levels: {
+          '国家级': { '一等奖': 3, '二等奖': 2, '三等奖': 1, '集体奖': 0.3 },
+          '省市级': { '一等奖': 2, '二等奖': 1, '三等奖': 0.5, '集体奖': 0.2 },
+          '校级': { '一等奖': 1, '二等奖': 0.5, '三等奖': 0.3, '集体奖': 0.1 }
+        }
+      },
+      honor: {
+        title: '荣誉称号',
+        levels: {
+          '国家级': 5,
+          '省市级': 3,
+          '校级': 1,
+          '院级': 0.5
+        }
+      }
+    };
+
+    const projectData = {
+      '国家级': { '负责人': 1, '组员': 0.8 },
+      '上海市级': { '负责人': 0.8, '组员': 0.6 },
+      '校级': { '负责人': 0.6, '组员': 0.4 },
+      '师范生研习': { '负责人': 0.4, '组员': 0.2 }
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      setupEventListeners();
+      updateTotalScore();
+    });
+
+    function setupEventListeners() {
+      // GPA input
+      document.getElementById('gpaInput').addEventListener('input', calculateGradeScore);
+
+      // Work select
+      const workSelect = document.getElementById('workSelect');
+      workSelect.querySelector('.select-display').addEventListener('click', function() {
+        workSelect.classList.toggle('active');
+      });
+
+      document.querySelectorAll('#workSelect .select-option').forEach(option => {
+        option.addEventListener('click', function() {
+          const value = parseFloat(this.dataset.value);
+          const label = this.dataset.label;
+          document.getElementById('workSelectText').textContent = label;
+          scores.work = value;
+          updateScoreDisplay('workScore', value);
+          updateTotalScore();
+          workSelect.classList.remove('active');
+        });
+      });
+
+      // Close dropdowns when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.select-wrapper')) {
+          document.querySelectorAll('.select-wrapper').forEach(el => {
+            el.classList.remove('active');
+          });
+        }
+      });
+
+      // Add buttons
+      document.getElementById('addQualityBtn').addEventListener('click', function() {
+        openModal('qualityModal');
+      });
+
+      document.getElementById('addAcademicBtn').addEventListener('click', function() {
+        openModal('academicModal');
+      });
+
+      document.getElementById('addProjectBtn').addEventListener('click', function() {
+        openModal('projectModal');
+      });
+
+      // Blood donation checkbox
+      document.getElementById('bloodDonation').addEventListener('change', function() {
+        const checkbox = this.parentElement.querySelector('.checkbox svg');
+        if (this.checked) {
+          checkbox.style.display = 'block';
+          scores.other = 0.3;
+        } else {
+          checkbox.style.display = 'none';
+          scores.other = 0;
+        }
+        updateScoreDisplay('otherScore', scores.other);
+        updateTotalScore();
+      });
+
+      // Submit button
+      document.getElementById('submitBtn').addEventListener('click', function() {
+        showToast('申请提交成功！');
+      });
+    }
+
+    function calculateGradeScore() {
+      const gpa = parseFloat(this.value) || 0;
+      scores.grade = gpa * 20;
+      updateScoreDisplay('gradeScore', scores.grade);
+      updateTotalScore();
+    }
+
+    function updateScoreDisplay(elementId, score) {
+      document.getElementById(elementId).textContent = score.toFixed(1) + '分';
+    }
+
+    function updateTotalScore() {
+      const total = scores.grade + scores.work + scores.quality + scores.academic + scores.project + scores.other;
+      document.getElementById('totalScore').textContent = total.toFixed(1);
+    }
+
+    // Modal functions
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('active');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    // Quality bonus functions
+    let currentQualityType = '';
+
+    function showQualitySubType(type) {
+      currentQualityType = type;
+      const data = qualityData[type];
+      const subModal = document.getElementById('qualitySubModal');
+      const subTitle = document.getElementById('qualitySubTitle');
+      const subBody = document.getElementById('qualitySubBody');
+
+      subTitle.textContent = data.title;
+      subBody.innerHTML = '';
+
+      if (type === 'honor') {
+        // Honor titles have simple level selection
+        Object.entries(data.levels).forEach(([level, score]) => {
+          const option = document.createElement('div');
+          option.className = 'cascader-option';
+          option.textContent = `${level} (${score}分)`;
+          option.onclick = function() {
+            addQualityItem(data.title, level, score);
+          };
+          subBody.appendChild(option);
+        });
+      } else {
+        // Competition and sports have level + prize selection
+        Object.entries(data.levels).forEach(([level, prizes]) => {
+          const option = document.createElement('div');
+          option.className = 'cascader-option';
+          option.innerHTML = `
+            <span>${level}</span>
+            <svg class="cascader-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          `;
+          option.onclick = function() {
+            showQualityPrizes(level, prizes);
+          };
+          subBody.appendChild(option);
+        });
+      }
+
+      closeModal('qualityModal');
+      openModal('qualitySubModal');
+    }
+
+    function showQualityPrizes(level, prizes) {
+      const subBody = document.getElementById('qualitySubBody');
+      subBody.innerHTML = '';
+
+      Object.entries(prizes).forEach(([prize, score]) => {
+        const option = document.createElement('div');
+        option.className = 'cascader-option';
+        option.textContent = `${prize} (${score}分)`;
+        option.onclick = function() {
+          addQualityItem(qualityData[currentQualityType].title, `${level} ${prize}`, score);
+        };
+        subBody.appendChild(option);
+      });
+    }
+
+    function addQualityItem(type, detail, score) {
+      qualityItems.push({ type, detail, score });
+      scores.quality = qualityItems.reduce((sum, item) => sum + item.score, 0);
+      updateScoreDisplay('qualityScore', scores.quality);
+      updateTotalScore();
+      renderQualityList();
+      closeModal('qualitySubModal');
+    }
+
+    function renderQualityList() {
+      const list = document.getElementById('qualityList');
+      if (qualityItems.length === 0) {
+        list.innerHTML = '<div class="empty-state">暂无素质类加分项</div>';
+        return;
+      }
+
+      list.innerHTML = qualityItems.map((item, index) => `
+        <div class="item">
+          <div class="item-info">
+            <div class="item-title">${item.type}</div>
+            <div class="item-detail">${item.detail}</div>
+          </div>
+          <span class="item-score">+${item.score}分</span>
+          <button class="item-remove" onclick="removeQualityItem(${index})">×</button>
+        </div>
+      `).join('');
+    }
+
+    function removeQualityItem(index) {
+      qualityItems.splice(index, 1);
+      scores.quality = qualityItems.reduce((sum, item) => sum + item.score, 0);
+      updateScoreDisplay('qualityScore', scores.quality);
+      updateTotalScore();
+      renderQualityList();
+    }
+
+    // Academic functions
+    function addAcademicItem(type, role, score) {
+      academicItems.push({ type, role, score });
+      scores.academic = academicItems.reduce((sum, item) => sum + item.score, 0);
+      updateScoreDisplay('academicScore', scores.academic);
+      updateTotalScore();
+      renderAcademicList();
+      closeModal('academicModal');
+    }
+
+    function renderAcademicList() {
+      const list = document.getElementById('academicList');
+      if (academicItems.length === 0) {
+        list.innerHTML = '<div class="empty-state">暂无学术成果</div>';
+        return;
+      }
+
+      list.innerHTML = academicItems.map((item, index) => `
+        <div class="item">
+          <div class="item-info">
+            <div class="item-title">${item.type}</div>
+            <div class="item-detail">${item.role}</div>
+          </div>
+          <span class="item-score">+${item.score}分</span>
+          <button class="item-remove" onclick="removeAcademicItem(${index})">×</button>
+        </div>
+      `).join('');
+    }
+
+    function removeAcademicItem(index) {
+      academicItems.splice(index, 1);
+      scores.academic = academicItems.reduce((sum, item) => sum + item.score, 0);
+      updateScoreDisplay('academicScore', scores.academic);
+      updateTotalScore();
+      renderAcademicList();
+    }
+
+    // Project functions
+    let currentProjectLevel = '';
+
+    function showProjectRole(level) {
+      currentProjectLevel = level;
+      const roleModal = document.getElementById('projectRoleModal');
+      const roleTitle = document.getElementById('projectRoleTitle');
+      const roleBody = document.getElementById('projectRoleBody');
+
+      roleTitle.textContent = level;
+      roleBody.innerHTML = '';
+
+      const roles = projectData[level];
+      Object.entries(roles).forEach(([role, score]) => {
+        const option = document.createElement('div');
+        option.className = 'cascader-option';
+        option.textContent = `${role} (${score}分)`;
+        option.onclick = function() {
+          addProjectItem(level, role, score);
+        };
+        roleBody.appendChild(option);
+      });
+
+      closeModal('projectModal');
+      openModal('projectRoleModal');
+    }
+
+    function addProjectItem(level, role, score) {
+      projectItems.push({ level, role, score });
+      scores.project = projectItems.reduce((sum, item) => sum + item.score, 0);
+      updateScoreDisplay('projectScore', scores.project);
+      updateTotalScore();
+      renderProjectList();
+      closeModal('projectRoleModal');
+    }
+
+    function renderProjectList() {
+      const list = document.getElementById('projectList');
+      if (projectItems.length === 0) {
+        list.innerHTML = '<div class="empty-state">暂无科创项目</div>';
+        return;
+      }
+
+      list.innerHTML = projectItems.map((item, index) => `
+        <div class="item">
+          <div class="item-info">
+            <div class="item-title">${item.level}科创项目</div>
+            <div class="item-detail">${item.role}</div>
+          </div>
+          <span class="item-score">+${item.score}分</span>
+          <button class="item-remove" onclick="removeProjectItem(${index})">×</button>
+        </div>
+      `).join('');
+    }
+
+    function removeProjectItem(index) {
+      projectItems.splice(index, 1);
+      scores.project = projectItems.reduce((sum, item) => sum + item.score, 0);
+      updateScoreDisplay('projectScore', scores.project);
+      updateTotalScore();
+      renderProjectList();
+    }
+
+    // Toast function
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('active');
+      setTimeout(() => {
+        toast.classList.remove('active');
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
