@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奖学金申请系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+
+        .score-preview {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .score-preview h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .score-preview .total-score {
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .module-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .module-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .module-card.has-data {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        }
+
+        .module-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .module-score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #764ba2;
+        }
+
+        .module-count {
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #6c757d;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group.hidden {
+            display: none;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .image-upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .image-upload-area:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .image-upload-area.hidden {
+            display: none;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .items-list {
+            margin-top: 20px;
+        }
+
+        .item-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-score {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+            margin-right: 15px;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .calculated-score {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 奖学金申请系统</h1>
+        
+        <div class="score-preview">
+            <h2>当前总分</h2>
+            <div class="total-score" id="totalScore">0.00</div>
+        </div>
+
+        <div class="module-grid">
+            <!-- 学业成绩 -->
+            <div class="module-card" id="academicCard" onclick="openModal('academic')">
+                <h3>📚 学业成绩</h3>
+                <div class="module-score" id="academicScore">0.00 分</div>
+                <div class="module-count" id="academicCount">未填写</div>
+            </div>
+
+            <!-- 学生工作 -->
+            <div class="module-card" id="studentWorkCard" onclick="openModal('studentWork')">
+                <h3>💼 学生工作</h3>
+                <div class="module-score" id="studentWorkScore">0.00 分</div>
+                <div class="module-count" id="studentWorkCount">0 项</div>
+            </div>
+
+            <!-- 学科竞赛 -->
+            <div class="module-card" id="subjectCompCard" onclick="openModal('subjectComp')">
+                <h3>🏆 学科竞赛</h3>
+                <div class="module-score" id="subjectCompScore">0.00 分</div>
+                <div class="module-count" id="subjectCompCount">0 项</div>
+            </div>
+
+            <!-- 文体比赛 -->
+            <div class="module-card" id="sportsCompCard" onclick="openModal('sportsComp')">
+                <h3>🎨 文体比赛</h3>
+                <div class="module-score" id="sportsCompScore">0.00 分</div>
+                <div class="module-count" id="sportsCompCount">0 项</div>
+            </div>
+
+            <!-- 荣誉称号 -->
+            <div class="module-card" id="honorCard" onclick="openModal('honor')">
+                <h3>🌟 荣誉称号</h3>
+                <div class="module-score" id="honorScore">0.00 分</div>
+                <div class="module-count" id="honorCount">0 项</div>
+            </div>
+
+            <!-- 书院活动 -->
+            <div class="module-card" id="collegeActivityCard" onclick="openModal('collegeActivity')">
+                <h3>🏛️ 书院活动</h3>
+                <div class="module-score" id="collegeActivityScore">0.00 分</div>
+                <div class="module-count" id="collegeActivityCount">0 项</div>
+            </div>
+
+            <!-- 学术成果 -->
+            <div class="module-card" id="academicAchievCard" onclick="openModal('academicAchiev')">
+                <h3>📝 学术成果</h3>
+                <div class="module-score" id="academicAchievScore">0.00 分</div>
+                <div class="module-count" id="academicAchievCount">0 项</div>
+            </div>
+
+            <!-- 科创项目 -->
+            <div class="module-card" id="innovationCard" onclick="openModal('innovation')">
+                <h3>💡 科创项目</h3>
+                <div class="module-score" id="innovationScore">0.00 分</div>
+                <div class="module-count" id="innovationCount">0 项</div>
+            </div>
+
+            <!-- 义务献血 -->
+            <div class="module-card" id="bloodDonationCard" onclick="openModal('bloodDonation')">
+                <h3>❤️ 义务献血</h3>
+                <div class="module-score" id="bloodDonationScore">0.00 分</div>
+                <div class="module-count" id="bloodDonationCount">0 项</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- 学业成绩 Modal -->
+    <div class="modal" id="academicModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📚 学业成绩</h2>
+                <button class="close-btn" onclick="closeModal('academic')">&times;</button>
+            </div>
+            <form id="academicForm">
+                <div class="form-group">
+                    <label>总学分</label>
+                    <input type="number" id="academicCredits" step="0.1" placeholder="请输入总学分">
+                </div>
+                <div class="form-group">
+                    <label>GPA</label>
+                    <input type="number" id="academicGPA" step="0.01" max="4.0" placeholder="请输入GPA (0-4.0)">
+                </div>
+                <div class="calculated-score" id="academicCalculated">计算分数：0.00</div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('academic')">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAcademic()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 学生工作 Modal -->
+    <div class="modal" id="studentWorkModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💼 学生工作</h2>
+                <button class="close-btn" onclick="closeModal('studentWork')">&times;</button>
+            </div>
+            <form id="studentWorkForm">
+                <div class="form-group">
+                    <label>职位类型</label>
+                    <select id="studentWorkType">
+                        <option value="">请选择职位类型</option>
+                        <option value="5">校学生会主席/副主席 (5分)</option>
+                        <option value="4">院学生会主席/副主席 (4分)</option>
+                        <option value="3">校学生会部长 (3分)</option>
+                        <option value="2">院学生会部长 (2分)</option>
+                        <option value="1">班级干部 (1分)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>备注说明</label>
+                    <textarea id="studentWorkNote" rows="3" placeholder="请简要描述工作内容"></textarea>
+                </div>
+                <div class="form-group" id="studentWorkImageGroup">
+                    <label>上传证明材料</label>
+                    <div class="image-upload-area" onclick="document.getElementById('studentWorkImage').click()">
+                        <p>📷 点击上传图片</p>
+                        <input type="file" id="studentWorkImage" accept="image/*" style="display:none" onchange="previewImage(this, 'studentWorkPreview')">
+                        <img id="studentWorkPreview" class="image-preview" style="display:none">
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('studentWork')">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addItem('studentWork')">添加</button>
+                </div>
+            </form>
+            <div class="items-list" id="studentWorkList"></div>
+        </div>
+    </div>
+
+    <!-- 学科竞赛 Modal -->
+    <div class="modal" id="subjectCompModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🏆 学科竞赛</h2>
+                <button class="close-btn" onclick="closeModal('subjectComp')">&times;</button>
+            </div>
+            <form id="subjectCompForm">
+                <div class="form-group">
+                    <label>竞赛名称</label>
+                    <input type="text" id="subjectCompName" placeholder="请输入竞赛名称">
+                </div>
+                <div class="form-group">
+                    <label>竞赛级别</label>
+                    <select id="subjectCompLevel" onchange="updateSubjectCompGrade()">
+                        <option value="">请选择级别</option>
+                        <option value="national">国家级</option>
+                        <option value="provincial">省市级</option>
+                        <option value="school">校级</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>获奖等级</label>
+                    <select id="subjectCompGrade">
+                        <option value="">请先选择竞赛级别</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>备注说明</label>
+                    <textarea id="subjectCompNote" rows="3" placeholder="请简要描述获奖情况"></textarea>
+                </div>
+                <div class="form-group hidden" id="subjectCompImageGroup">
+                    <label>上传证明材料</label>
+                    <div class="image-upload-area" onclick="document.getElementById('subjectCompImage').click()">
+                        <p>📷 点击上传图片</p>
+                        <input type="file" id="subjectCompImage" accept="image/*" style="display:none" onchange="previewImage(this, 'subjectCompPreview')">
+                        <img id="subjectCompPreview" class="image-preview" style="display:none">
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('subjectComp')">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addItem('subjectComp')">添加</button>
+                </div>
+            </form>
+            <div class="items-list" id="subjectCompList"></div>
+        </div>
+    </div>
+
+    <!-- 文体比赛 Modal -->
+    <div class="modal" id="sportsCompModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🎨 文体比赛</h2>
+                <button class="close-btn" onclick="closeModal('sportsComp')">&times;</button>
+            </div>
+            <form id="sportsCompForm">
+                <div class="form-group">
+                    <label>比赛名称</label>
+                    <input type="text" id="sportsCompName" placeholder="请输入比赛名称">
+                </div>
+                <div class="form-group">
+                    <label>比赛级别</label>
+                    <select id="sportsCompLevel" onchange="updateSportsCompGrade()">
+                        <option value="">请选择级别</option>
+                        <option value="national">国家级</option>
+                        <option value="provincial">省市级</option>
+                        <option value="school">校级</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>获奖等级</label>
+                    <select id="sportsCompGrade">
+                        <option value="">请先选择比赛级别</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>备注说明</label>
+                    <textarea id="sportsCompNote" rows="3" placeholder="请简要描述获奖情况"></textarea>
+                </div>
+                <div class="form-group hidden" id="sportsCompImageGroup">
+                    <label>上传证明材料</label>
+                    <div class="image-upload-area" onclick="document.getElementById('sportsCompImage').click()">
+                        <p>📷 点击上传图片</p>
+                        <input type="file" id="sportsCompImage" accept="image/*" style="display:none" onchange="previewImage(this, 'sportsCompPreview')">
+                        <img id="sportsCompPreview" class="image-preview" style="display:none">
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('sportsComp')">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addItem('sportsComp')">添加</button>
+                </div>
+            </form>
+            <div class="items-list" id="sportsCompList"></div>
+        </div>
+    </div>
+
+    <!-- 荣誉称号 Modal -->
+    <div class="modal" id="honorModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🌟 荣誉称号</h2>
+                <button class="close-btn" onclick="closeModal('honor')">&times;</button>
+            </div>
+            <form id="honorForm">
+                <div class="form-group">
+                    <label>荣誉名称</label>
+                    <input type="text" id="honorName" placeholder="请输入荣誉名称">
+                </div>
+                <div class="form-group">
+                    <label>荣誉级别</label>
+                    <select id="honorLevel">
+                        <option value="">请选择级别</option>
+                        <option value="5">国家级 (5分)</option>
+                        <option value="3">省市级 (3分)</option>
+                        <option value="1">校级 (1分)</option>
+                        <option value="0.5">院级 (0.5分)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>备注说明</label>
+                    <textarea id="honorNote" rows="3" placeholder="请简要描述荣誉情况"></textarea>
+                </div>
+                <div class="form-group hidden" id="honorImageGroup">
+                    <label>上传证明材料</label>
+                    <div class="image-upload-area" onclick="document.getElementById('honorImage').click()">
+                        <p>📷 点击上传图片</p>
+                        <input type="file" id="honorImage" accept="image/*" style="display:none" onchange="previewImage(this, 'honorPreview')">
+                        <img id="honorPreview" class="image-preview" style="display:none">
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('honor')">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addItem('honor')">添加</button>
+                </div>
+            </form>
+            <div class="items-list" id="honorList"></div>
+        </div>
+    </div>
+
+    <!-- 书院活动 Modal -->
+    <div class="modal" id="collegeActivityModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🏛️ 书院活动</h2>
+                <button class="close-btn" onclick="closeModal('collegeActivity')">&times;</button>
+            </div>
+            <form id="collegeActivityForm">
+                <div class="form-group">
+                    <label>活动名称</label>
+                    <input type="text" id="collegeActivityName" placeholder="请输入活动名称">
+                </div>
+                <div class="form-group">
+                    <label>获奖等级</label>
+                    <select id="collegeActivityLevel">
+                        <option value="">请选择等级</option>
+                        <option value="0.3">一等奖 (0.3分)</option>
+                        <option value="0.2">二等奖 (0.2分)</option>
+                        <option value="0.1">三等奖 (0.1分)</option>
+                        <option value="0.1">优秀志愿者 (0.1分)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>备注说明</label>
+                    <textarea id="collegeActivityNote" rows="3" placeholder="请简要描述活动情况"></textarea>
+                </div>
+                <div class="form-group hidden" id="collegeActivityImageGroup">
+                    <label>上传证明材料</label>
+                    <div class="image-upload-area" onclick="document.getElementById('collegeActivityImage').click()">
+                        <p>📷 点击上传图片</p>
+                        <input type="file" id="collegeActivityImage" accept="image/*" style="display:none" onchange="previewImage(this, 'collegeActivityPreview')">
+                        <img id="collegeActivityPreview" class="image-preview" style="display:none">
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('collegeActivity')">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addItem('collegeActivity')">添加</button>
+                </div>
+            </form>
+            <div class="items-list" id="collegeActivityList"></div>
+        </div>
+    </div>
+
+    <!-- 学术成果 Modal -->
+    <div class="modal" id="academicAchievModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📝 学术成果</h2>
+                <button class="close-btn" onclick="closeModal('academicAchiev')">&times;</button>
+            </div>
+            <form id="academicAchievForm">
+                <div class="form-group">
+                    <label>成果名称</label>
+                    <input type="text" id="academicAchievName" placeholder="请输入论文或专利名称">
+                </div>
+                <div class="form-group">
+                    <label>成果类型</label>
+                    <select id="academicAchievType" onchange="updateAcademicAchievRanking()">
+                        <option value="">请选择类型</option>
+                        <option value="sci-research">SCI研究性论文/发明专利</option>
+                        <option value="sci-review">SCI综述性论文</option>
+                        <option value="other">其他学术论文</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>作者排名</label>
+                    <select id="academicAchievRanking">
+                        <option value="">请先选择成果类型</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>备注说明</label>
+                    <textarea id="academicAchievNote" rows="3" placeholder="请简要描述成果情况"></textarea>
+                </div>
+                <div class="form-group hidden" id="academicAchievImageGroup">
+                    <label>上传证明材料</label>
+                    <div class="image-upload-area" onclick="document.getElementById('academicAchievImage').click()">
+                        <p>📷 点击上传图片</p>
+                        <input type="file" id="academicAchievImage" accept="image/*" style="display:none" onchange="previewImage(this, 'academicAchievPreview')">
+                        <img id="academicAchievPreview" class="image-preview" style="display:none">
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('academicAchiev')">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addItem('academicAchiev')">添加</button>
+                </div>
+            </form>
+            <div class="items-list" id="academicAchievList"></div>
+        </div>
+    </div>
+
+    <!-- 科创项目 Modal -->
+    <div class="modal" id="innovationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💡 科创项目</h2>
+                <button class="close-btn" onclick="closeModal('innovation')">&times;</button>
+            </div>
+            <form id="innovationForm">
+                <div class="form-group">
+                    <label>项目名称</label>
+                    <input type="text" id="innovationName" placeholder="请输入项目名称">
+                </div>
+                <div class="form-group">
+                    <label>项目类型</label>
+                    <select id="innovationType" onchange="updateInnovationRole()">
+                        <option value="">请选择类型</option>
+                        <option value="national">国家大创</option>
+                        <option value="shanghai">上海市大创</option>
+                        <option value="school">校级/大夏基金</option>
+                        <option value="teacher">师范生研习</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>项目角色</label>
+                    <select id="innovationRole">
+                        <option value="">请先选择项目类型</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>备注说明</label>
+                    <textarea id="innovationNote" rows="3" placeholder="请简要描述项目情况"></textarea>
+                </div>
+                <div class="form-group hidden" id="innovationImageGroup">
+                    <label>上传证明材料</label>
+                    <div class="image-upload-area" onclick="document.getElementById('innovationImage').click()">
+                        <p>📷 点击上传图片</p>
+                        <input type="file" id="innovationImage" accept="image/*" style="display:none" onchange="previewImage(this, 'innovationPreview')">
+                        <img id="innovationPreview" class="image-preview" style="display:none">
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('innovation')">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addItem('innovation')">添加</button>
+                </div>
+            </form>
+            <div class="items-list" id="innovationList"></div>
+        </div>
+    </div>
+
+    <!-- 义务献血 Modal -->
+    <div class="modal" id="bloodDonationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>❤️ 义务献血</h2>
+                <button class="close-btn" onclick="closeModal('bloodDonation')">&times;</button>
+            </div>
+            <form id="bloodDonationForm">
+                <div class="form-group">
+                    <label>献血日期</label>
+                    <input type="date" id="bloodDonationDate">
+                </div>
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="bloodDonationConfirm" onchange="toggleBloodDonationImage()">
+                        <label for="bloodDonationConfirm">我确认参加过义务献血 (+0.3分)</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>备注说明</label>
+                    <textarea id="bloodDonationNote" rows="3" placeholder="请简要描述献血情况"></textarea>
+                </div>
+                <div class="form-group hidden" id="bloodDonationImageGroup">
+                    <label>上传证明材料</label>
+                    <div class="image-upload-area" onclick="document.getElementById('bloodDonationImage').click()">
+                        <p>📷 点击上传图片</p>
+                        <input type="file" id="bloodDonationImage" accept="image/*" style="display:none" onchange="previewImage(this, 'bloodDonationPreview')">
+                        <img id="bloodDonationPreview" class="image-preview" style="display:none">
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('bloodDonation')">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addItem('bloodDonation')">添加</button>
+                </div>
+            </form>
+            <div class="items-list" id="bloodDonationList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        const scholarshipData = {
+            academic: { credits: 0, gpa: 0, score: 0 },
+            studentWork: [],
+            subjectComp: [],
+            sportsComp: [],
+            honor: [],
+            collegeActivity: [],
+            academicAchiev: [],
+            innovation: [],
+            bloodDonation: []
+        };
+
+        // Score configurations
+        const scoreConfig = {
+            subjectComp: {
+                national: { first: 5, second: 4, third: 3, fourth: 2 },
+                provincial: { first: 4, second: 3, third: 2, fourth: 1 },
+                school: { first: 1.5, second: 1, third: 0.5 }
+            },
+            sportsComp: {
+                national: { first: 3, second: 2, third: 1, collective: 0.3 },
+                provincial: { first: 2, second: 1, third: 0.5, collective: 0.2 },
+                school: { first: 1, second: 0.5, third: 0.3, collective: 0.1 }
+            },
+            academicAchiev: {
+                'sci-research': { first: 3, second: 1.5 },
+                'sci-review': { first: 2, second: 1 },
+                'other': { first: 1 }
+            },
+            innovation: {
+                national: { leader: 1, member: 0.8 },
+                shanghai: { leader: 0.8, member: 0.6 },
+                school: { leader: 0.6, member: 0.4 },
+                teacher: { leader: 0.4, member: 0.2 }
+            }
+        };
+
+        // Modal functions
+        function openModal(type) {
+            const modal = document.getElementById(type + 'Modal');
+            modal.classList.add('active');
+            // Reset form when opening
+            if (type !== 'academic') {
+                resetModalForm(type);
+            } else {
+                // Load academic data
+                document.getElementById('academicCredits').value = scholarshipData.academic.credits || '';
+                document.getElementById('academicGPA').value = scholarshipData.academic.gpa || '';
+                calculateAcademicScore();
+            }
+        }
+
+        function closeModal(type) {
+            const modal = document.getElementById(type + 'Modal');
+            modal.classList.remove('active');
+        }
+
+        function resetModalForm(type) {
+            const form = document.getElementById(type + 'Form');
+            form.reset();
+            
+            // Hide image upload areas
+            const imageGroup = document.getElementById(type + 'ImageGroup');
+            if (imageGroup) {
+                imageGroup.classList.add('hidden');
+            }
+            
+            // Reset image previews
+            const preview = document.getElementById(type + 'Preview');
+            if (preview) {
+                preview.style.display = 'none';
+                preview.src = '';
+            }
+            
+            // Reset cascading selects
+            if (type === 'subjectComp') {
+                document.getElementById('subjectCompGrade').innerHTML = '<option value="">请先选择竞赛级别</option>';
+            } else if (type === 'sportsComp') {
+                document.getElementById('sportsCompGrade').innerHTML = '<option value="">请先选择比赛级别</option>';
+            } else if (type === 'academicAchiev') {
+                document.getElementById('academicAchievRanking').innerHTML = '<option value="">请先选择成果类型</option>';
+            } else if (type === 'innovation') {
+                document.getElementById('innovationRole').innerHTML = '<option value="">请先选择项目类型</option>';
+            }
+        }
+
+        // Academic score calculation
+        function calculateAcademicScore() {
+            const credits = parseFloat(document.getElementById('academicCredits').value) || 0;
+            const gpa = parseFloat(document.getElementById('academicGPA').value) || 0;
+            const score = gpa * 20;
+            document.getElementById('academicCalculated').textContent = `计算分数：${score.toFixed(2)}`;
+        }
+
+        document.getElementById('academicCredits').addEventListener('input', calculateAcademicScore);
+        document.getElementById('academicGPA').addEventListener('input', calculateAcademicScore);
+
+        function saveAcademic() {
+            const credits = parseFloat(document.getElementById('academicCredits').value);
+            const gpa = parseFloat(document.getElementById('academicGPA').value);
+            
+            if (!credits || !gpa) {
+                alert('请填写完整信息');
+                return;
+            }
+            
+            if (gpa > 4.0) {
+                alert('GPA不能超过4.0');
+                return;
+            }
+            
+            scholarshipData.academic = {
+                credits: credits,
+                gpa: gpa,
+                score: gpa * 20
+            };
+            
+            updateDisplay();
+            closeModal('academic');
+        }
+
+        // Cascading select updates
+        function updateSubjectCompGrade() {
+            const level = document.getElementById('subjectCompLevel').value;
+            const gradeSelect = document.getElementById('subjectCompGrade');
+            const imageGroup = document.getElementById('subjectCompImageGroup');
+            
+            gradeSelect.innerHTML = '<option value="">请选择等级</option>';
+            
+            if (level === 'national') {
+                gradeSelect.innerHTML += `
+                    <option value="5">一等奖 (5分)</option>
+                    <option value="4">二等奖 (4分)</option>
+                    <option value="3">三等奖 (3分)</option>
+                    <option value="2">四等奖 (2分)</option>
+                `;
+            } else if (level === 'provincial') {
+                gradeSelect.innerHTML += `
+                    <option value="4">一等奖 (4分)</option>
+                    <option value="3">二等奖 (3分)</option>
+                    <option value="2">三等奖 (2分)</option>
+                    <option value="1">四等奖 (1分)</option>
+                `;
+            } else if (level === 'school') {
+                gradeSelect.innerHTML += `
+                    <option value="1.5">一等奖 (1.5分)</option>
+                    <option value="1">二等奖 (1分)</option>
+                    <option value="0.5">三等奖 (0.5分)</option>
+                `;
+            }
+            
+            // Show image upload when grade is selected
+            gradeSelect.onchange = function() {
+                if (gradeSelect.value) {
+                    imageGroup.classList.remove('hidden');
+                }
+            };
+        }
+
+        function updateSportsCompGrade() {
+            const level = document.getElementById('sportsCompLevel').value;
+            const gradeSelect = document.getElementById('sportsCompGrade');
+            const imageGroup = document.getElementById('sportsCompImageGroup');
+            
+            gradeSelect.innerHTML = '<option value="">请选择等级</option>';
+            
+            if (level === 'national') {
+                gradeSelect.innerHTML += `
+                    <option value="3">一等奖 (3分)</option>
+                    <option value="2">二等奖 (2分)</option>
+                    <option value="1">三等奖 (1分)</option>
+                    <option value="0.3">集体奖 (0.3分)</option>
+                `;
+            } else if (level === 'provincial') {
+                gradeSelect.innerHTML += `
+                    <option value="2">一等奖 (2分)</option>
+                    <option value="1">二等奖 (1分)</option>
+                    <option value="0.5">三等奖 (0.5分)</option>
+                    <option value="0.2">集体奖 (0.2分)</option>
+                `;
+            } else if (level === 'school') {
+                gradeSelect.innerHTML += `
+                    <option value="1">一等奖 (1分)</option>
+                    <option value="0.5">二等奖 (0.5分)</option>
+                    <option value="0.3">三等奖 (0.3分)</option>
+                    <option value="0.1">集体奖 (0.1分)</option>
+                `;
+            }
+            
+            // Show image upload when grade is selected
+            gradeSelect.onchange = function() {
+                if (gradeSelect.value) {
+                    imageGroup.classList.remove('hidden');
+                }
+            };
+        }
+
+        function updateAcademicAchievRanking() {
+            const type = document.getElementById('academicAchievType').value;
+            const rankingSelect = document.getElementById('academicAchievRanking');
+            const imageGroup = document.getElementById('academicAchievImageGroup');
+            
+            rankingSelect.innerHTML = '<option value="">请选择排名</option>';
+            
+            if (type === 'sci-research') {
+                rankingSelect.innerHTML += `
+                    <option value="3">第一作者 (3分)</option>
+                    <option value="1.5">第二作者 (1.5分)</option>
+                `;
+            } else if (type === 'sci-review') {
+                rankingSelect.innerHTML += `
+                    <option value="2">第一作者 (2分)</option>
+                    <option value="1">第二作者 (1分)</option>
+                `;
+            } else if (type === 'other') {
+                rankingSelect.innerHTML += `
+                    <option value="1">第一作者 (1分)</option>
+                `;
+            }
+            
+            // Show image upload when ranking is selected
+            rankingSelect.onchange = function() {
+                if (rankingSelect.value) {
+                    imageGroup.classList.remove('hidden');
+                }
+            };
+        }
+
+        function updateInnovationRole() {
+            const type = document.getElementById('innovationType').value;
+            const roleSelect = document.getElementById('innovationRole');
+            const imageGroup = document.getElementById('innovationImageGroup');
+            
+            roleSelect.innerHTML = '<option value="">请选择角色</option>';
+            
+            if (type === 'national') {
+                roleSelect.innerHTML += `
+                    <option value="1">负责人 (1分)</option>
+                    <option value="0.8">组员 (0.8分)</option>
+                `;
+            } else if (type === 'shanghai') {
+                roleSelect.innerHTML += `
+                    <option value="0.8">负责人 (0.8分)</option>
+                    <option value="0.6">组员 (0.6分)</option>
+                `;
+            } else if (type === 'school') {
+                roleSelect.innerHTML += `
+                    <option value="0.6">负责人 (0.6分)</option>
+                    <option value="0.4">组员 (0.4分)</option>
+                `;
+            } else if (type === 'teacher') {
+                roleSelect.innerHTML += `
+                    <option value="0.4">负责人 (0.4分)</option>
+                    <option value="0.2">组员 (0.2分)</option>
+                `;
+            }
+            
+            // Show image upload when role is selected
+            roleSelect.onchange = function() {
+                if (roleSelect.value) {
+                    imageGroup.classList.remove('hidden');
+                }
+            };
+        }
+
+        // Image upload and preview
+        function previewImage(input, previewId) {
+            const preview = document.getElementById(previewId);
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Show/hide image upload for specific modules
+        document.getElementById('studentWorkType').addEventListener('change', function() {
+            const imageGroup = document.getElementById('studentWorkImageGroup');
+            if (this.value) {
+                imageGroup.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('honorLevel').addEventListener('change', function() {
+            const imageGroup = document.getElementById('honorImageGroup');
+            if (this.value) {
+                imageGroup.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('collegeActivityLevel').addEventListener('change', function() {
+            const imageGroup = document.getElementById('collegeActivityImageGroup');
+            if (this.value) {
+                imageGroup.classList.remove('hidden');
+            }
+        });
+
+        function toggleBloodDonationImage() {
+            const checkbox = document.getElementById('bloodDonationConfirm');
+            const imageGroup = document.getElementById('bloodDonationImageGroup');
+            if (checkbox.checked) {
+                imageGroup.classList.remove('hidden');
+            } else {
+                imageGroup.classList.add('hidden');
+            }
+        }
+
+        // Add item functions
+        function addItem(type) {
+            let item = {};
+            let valid = true;
+            
+            switch(type) {
+                case 'studentWork':
+                    const workType = document.getElementById('studentWorkType').value;
+                    if (!workType) {
+                        alert('请选择职位类型');
+                        return;
+                    }
+                    item = {
+                        type: document.getElementById('studentWorkType').options[document.getElementById('studentWorkType').selectedIndex].text,
+                        score: parseFloat(workType),
+                        note: document.getElementById('studentWorkNote').value,
+                        image: document.getElementById('studentWorkPreview').src
+                    };
+                    break;
+                    
+                case 'subjectComp':
+                    const scLevel = document.getElementById('subjectCompLevel').value;
+                    const scGrade = document.getElementById('subjectCompGrade').value;
+                    const scName = document.getElementById('subjectCompName').value;
+                    if (!scName || !scLevel || !scGrade) {
+                        alert('请填写完整信息');
+                        return;
+                    }
+                    item = {
+                        name: scName,
+                        level: document.getElementById('subjectCompLevel').options[document.getElementById('subjectCompLevel').selectedIndex].text,
+                        grade: document.getElementById('subjectCompGrade').options[document.getElementById('subjectCompGrade').selectedIndex].text,
+                        score: parseFloat(scGrade),
+                        note: document.getElementById('subjectCompNote').value,
+                        image: document.getElementById('subjectCompPreview').src
+                    };
+                    break;
+                    
+                case 'sportsComp':
+                    const spLevel = document.getElementById('sportsCompLevel').value;
+                    const spGrade = document.getElementById('sportsCompGrade').value;
+                    const spName = document.getElementById('sportsCompName').value;
+                    if (!spName || !spLevel || !spGrade) {
+                        alert('请填写完整信息');
+                        return;
+                    }
+                    item = {
+                        name: spName,
+                        level: document.getElementById('sportsCompLevel').options[document.getElementById('sportsCompLevel').selectedIndex].text,
+                        grade: document.getElementById('sportsCompGrade').options[document.getElementById('sportsCompGrade').selectedIndex].text,
+                        score: parseFloat(spGrade),
+                        note: document.getElementById('sportsCompNote').value,
+                        image: document.getElementById('sportsCompPreview').src
+                    };
+                    break;
+                    
+                case 'honor':
+                    const honorLevel = document.getElementById('honorLevel').value;
+                    const honorName = document.getElementById('honorName').value;
+                    if (!honorName || !honorLevel) {
+                        alert('请填写完整信息');
+                        return;
+                    }
+                    item = {
+                        name: honorName,
+                        level: document.getElementById('honorLevel').options[document.getElementById('honorLevel').selectedIndex].text,
+                        score: parseFloat(honorLevel),
+                        note: document.getElementById('honorNote').value,
+                        image: document.getElementById('honorPreview').src
+                    };
+                    break;
+                    
+                case 'collegeActivity':
+                    const actLevel = document.getElementById('collegeActivityLevel').value;
+                    const actName = document.getElementById('collegeActivityName').value;
+                    if (!actName || !actLevel) {
+                        alert('请填写完整信息');
+                        return;
+                    }
+                    item = {
+                        name: actName,
+                        level: document.getElementById('collegeActivityLevel').options[document.getElementById('collegeActivityLevel').selectedIndex].text,
+                        score: parseFloat(actLevel),
+                        note: document.getElementById('collegeActivityNote').value,
+                        image: document.getElementById('collegeActivityPreview').src
+                    };
+                    break;
+                    
+                case 'academicAchiev':
+                    const aaType = document.getElementById('academicAchievType').value;
+                    const aaRanking = document.getElementById('academicAchievRanking').value;
+                    const aaName = document.getElementById('academicAchievName').value;
+                    if (!aaName || !aaType || !aaRanking) {
+                        alert('请填写完整信息');
+                        return;
+                    }
+                    item = {
+                        name: aaName,
+                        type: document.getElementById('academicAchievType').options[document.getElementById('academicAchievType').selectedIndex].text,
+                        ranking: document.getElementById('academicAchievRanking').options[document.getElementById('academicAchievRanking').selectedIndex].text,
+                        score: parseFloat(aaRanking),
+                        note: document.getElementById('academicAchievNote').value,
+                        image: document.getElementById('academicAchievPreview').src
+                    };
+                    break;
+                    
+                case 'innovation':
+                    const innType = document.getElementById('innovationType').value;
+                    const innRole = document.getElementById('innovationRole').value;
+                    const innName = document.getElementById('innovationName').value;
+                    if (!innName || !innType || !innRole) {
+                        alert('请填写完整信息');
+                        return;
+                    }
+                    item = {
+                        name: innName,
+                        type: document.getElementById('innovationType').options[document.getElementById('innovationType').selectedIndex].text,
+                        role: document.getElementById('innovationRole').options[document.getElementById('innovationRole').selectedIndex].text,
+                        score: parseFloat(innRole),
+                        note: document.getElementById('innovationNote').value,
+                        image: document.getElementById('innovationPreview').src
+                    };
+                    break;
+                    
+                case 'bloodDonation':
+                    const bdConfirm = document.getElementById('bloodDonationConfirm').checked;
+                    const bdDate = document.getElementById('bloodDonationDate').value;
+                    if (!bdConfirm || !bdDate) {
+                        alert('请确认献血并选择日期');
+                        return;
+                    }
+                    item = {
+                        date: bdDate,
+                        score: 0.3,
+                        note: document.getElementById('bloodDonationNote').value,
+                        image: document.getElementById('bloodDonationPreview').src
+                    };
+                    break;
+            }
+            
+            scholarshipData[type].push(item);
+            updateDisplay();
+            renderItemList(type);
+            resetModalForm(type);
+        }
+
+        function deleteItem(type, index) {
+            if (confirm('确定要删除这项吗？')) {
+                scholarshipData[type].splice(index, 1);
+                updateDisplay();
+                renderItemList(type);
+            }
+        }
+
+        function renderItemList(type) {
+            const listContainer = document.getElementById(type + 'List');
+            const items = scholarshipData[type];
+            
+            if (items.length === 0) {
+                listContainer.innerHTML = '';
+                return;
+            }
+            
+            let html = '';
+            items.forEach((item, index) => {
+                let displayText = '';
+                switch(type) {
+                    case 'studentWork':
+                        displayText = item.type;
+                        break;
+                    case 'subjectComp':
+                    case 'sportsComp':
+                        displayText = `${item.name} - ${item.level} ${item.grade}`;
+                        break;
+                    case 'honor':
+                    case 'collegeActivity':
+                        displayText = `${item.name} - ${item.level}`;
+                        break;
+                    case 'academicAchiev':
+                        displayText = `${item.name} - ${item.type} ${item.ranking}`;
+                        break;
+                    case 'innovation':
+                        displayText = `${item.name} - ${item.type} ${item.role}`;
+                        break;
+                    case 'bloodDonation':
+                        displayText = `献血日期：${item.date}`;
+                        break;
+                }
+                
+                html += `
+                    <div class="item-card">
+                        <div class="item-info">${displayText}</div>
+                        <div class="item-score">+${item.score.toFixed(2)}</div>
+                        <button class="delete-btn" onclick="deleteItem('${type}', ${index})">删除</button>
+                    </div>
+                `;
+            });
+            
+            listContainer.innerHTML = html;
+        }
+
+        function updateDisplay() {
+            // Update academic
+            const academic = scholarshipData.academic;
+            document.getElementById('academicScore').textContent = academic.score.toFixed(2) + ' 分';
+            document.getElementById('academicCount').textContent = academic.credits ? `${academic.credits}学分，GPA ${academic.gpa}` : '未填写';
+            document.getElementById('academicCard').classList.toggle('has-data', academic.credits > 0);
+            
+            // Update other modules
+            const modules = ['studentWork', 'subjectComp', 'sportsComp', 'honor', 'collegeActivity', 'academicAchiev', 'innovation', 'bloodDonation'];
+            
+            modules.forEach(module => {
+                const items = scholarshipData[module];
+                const score = items.reduce((sum, item) => sum + item.score, 0);
+                
+                document.getElementById(module + 'Score').textContent = score.toFixed(2) + ' 分';
+                document.getElementById(module + 'Count').textContent = items.length + ' 项';
+                document.getElementById(module + 'Card').classList.toggle('has-data', items.length > 0);
+            });
+            
+            // Calculate total score
+            let totalScore = academic.score;
+            modules.forEach(module => {
+                totalScore += scholarshipData[module].reduce((sum, item) => sum + item.score, 0);
+            });
+            
+            document.getElementById('totalScore').textContent = totalScore.toFixed(2);
+        }
+
+        // Initialize
+        updateDisplay();
+    </script>
+</body>
+</html>
