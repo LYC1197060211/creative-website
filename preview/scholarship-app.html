@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>奖学金评选系统 - UI 预览</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* 手机框架样式 */
+    .phone-frame {
+      width: 375px;
+      min-height: 667px;
+      background: #000;
+      border-radius: 40px;
+      padding: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
+                  0 0 0 8px #333,
+                  0 0 0 10px #111;
+      position: relative;
+    }
+
+    .phone-frame::before {
+      content: '';
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 20px;
+      background: #000;
+      border-radius: 0 0 12px 12px;
+      z-index: 10;
+    }
+
+    .phone-content {
+      width: 100%;
+      height: 100%;
+      background: #F0F6FC;
+      border-radius: 32px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 小程序页面内容 */
+    .app-container {
+      width: 100%;
+      min-height: 100%;
+      background: #F0F6FC;
+      padding: 24px 24px 32px;
+    }
+
+    /* 顶部区域 */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: fadeInDown 0.6s ease-out;
+    }
+
+    .logo-container {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 24px;
+      background: linear-gradient(135deg, #1E5AA8 0%, #3A7BD5 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(30, 90, 168, 0.3),
+                  0 4px 12px rgba(30, 90, 168, 0.2),
+                  inset 0 -2px 8px rgba(0, 0, 0, 0.1);
+      position: relative;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .logo-container::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      background: linear-gradient(135deg, #D4A84B 0%, #F4C430 100%);
+      border-radius: 50%;
+      z-index: -1;
+      opacity: 0.3;
+      filter: blur(8px);
+    }
+
+    .graduation-cap {
+      width: 48px;
+      height: 48px;
+      color: #FFFFFF;
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1E5AA8;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 4px rgba(30, 90, 168, 0.1);
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #64748B;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    /* 卡片容器 */
+    .cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+
+    /* 角色卡片 */
+    .role-card {
+      background: #FFFFFF;
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04),
+                  0 4px 16px rgba(0, 0, 0, 0.03),
+                  0 8px 32px rgba(0, 0, 0, 0.02);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .role-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, transparent 0%, rgba(30, 90, 168, 0.02) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .role-card:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 8px 24px rgba(30, 90, 168, 0.15),
+                  0 4px 12px rgba(30, 90, 168, 0.1),
+                  0 2px 6px rgba(30, 90, 168, 0.08);
+    }
+
+    .role-card:hover::before {
+      opacity: 1;
+    }
+
+    .role-card:active {
+      transform: scale(0.98);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
+                  0 1px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    /* 图标容器 */
+    .icon-container {
+      flex-shrink: 0;
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+
+    .role-card:hover .icon-container {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .undergraduate .icon-container {
+      background: linear-gradient(135deg, #1E5AA8 0%, #3A7BD5 100%);
+      box-shadow: 0 4px 16px rgba(30, 90, 168, 0.25),
+                  inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .graduate .icon-container {
+      background: linear-gradient(135deg, #D4A84B 0%, #F4C430 100%);
+      box-shadow: 0 4px 16px rgba(212, 168, 75, 0.25),
+                  inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .icon-container svg {
+      width: 36px;
+      height: 36px;
+      color: #FFFFFF;
+    }
+
+    /* 卡片内容 */
+    .card-content {
+      flex: 1;
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1E293B;
+      margin-bottom: 6px;
+      transition: color 0.3s ease;
+    }
+
+    .role-card:hover .card-title {
+      color: #1E5AA8;
+    }
+
+    .card-description {
+      font-size: 13px;
+      color: #64748B;
+      line-height: 1.5;
+    }
+
+    /* 箭头图标 */
+    .arrow-icon {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      color: #CBD5E1;
+      transition: all 0.3s ease;
+    }
+
+    .role-card:hover .arrow-icon {
+      color: #1E5AA8;
+      transform: translateX(4px);
+    }
+
+    /* 动画 */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    /* 底部提示 */
+    .footer-hint {
+      text-align: center;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(100, 116, 139, 0.1);
+      animation: fadeInUp 0.6s ease-out 0.4s both;
+    }
+
+    .footer-hint p {
+      font-size: 12px;
+      color: #94A3B8;
+      line-height: 1.8;
+    }
+
+    /* 响应式 */
+    @media (max-width: 400px) {
+      .phone-frame {
+        width: 100%;
+        max-width: 375px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="phone-content">
+      <div class="app-container">
+        <!-- 顶部区域 -->
+        <div class="header">
+          <div class="logo-container">
+            <!-- 学士帽 SVG 图标 -->
+            <svg class="graduation-cap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+          </div>
+          <h1 class="title">奖学金评选系统</h1>
+          <p class="subtitle">华东师范大学化学与分子工程学院</p>
+        </div>
+
+        <!-- 角色选择卡片 -->
+        <div class="cards-container">
+          <!-- 本科生卡片 -->
+          <div class="role-card undergraduate" onclick="handleRoleClick('undergraduate')">
+            <div class="icon-container">
+              <!-- 本科生 SVG 图标 -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div class="card-content">
+              <h2 class="card-title">本科生</h2>
+              <p class="card-description">参与本科生奖学金评选</p>
+            </div>
+            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </div>
+
+          <!-- 研究生卡片 -->
+          <div class="role-card graduate" onclick="handleRoleClick('graduate')">
+            <div class="icon-container">
+              <!-- 研究生 SVG 图标 -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div class="card-content">
+              <h2 class="card-title">研究生</h2>
+              <p class="card-description">参与研究生奖学金评选</p>
+            </div>
+            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- 底部提示 -->
+        <div class="footer-hint">
+          <p>请选择您的身份进入相应的评选系统</p>
+          <p style="margin-top: 4px; font-size: 11px; color: #CBD5E1;">UI Design by UI/UX Pro Max</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function handleRoleClick(role) {
+      const card = event.currentTarget;
+      
+      // 添加点击动画
+      card.style.transition = 'transform 0.1s ease';
+      card.style.transform = 'scale(0.95)';
+      
+      setTimeout(() => {
+        card.style.transform = '';
+        
+        // 这里可以添加实际的导航逻辑
+        console.log(`Selected role: ${role}`);
+        alert(`您选择了：${role === 'undergraduate' ? '本科生' : '研究生'}`);
+      }, 100);
+    }
+
+    // 添加触摸支持
+    document.querySelectorAll('.role-card').forEach(card => {
+      card.addEventListener('touchstart', function(e) {
+        this.style.transform = 'scale(0.98)';
+      });
+      
+      card.addEventListener('touchend', function(e) {
+        setTimeout(() => {
+          this.style.transform = '';
+        }, 100);
+      });
+    });
+  </script>
+</body>
+</html>
