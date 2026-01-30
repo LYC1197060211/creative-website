@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学生身份绑定页面预览 - 微信小程序UI</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* 手机框架 */
+    .phone-frame {
+      width: 375px;
+      height: 812px;
+      background: #000;
+      border-radius: 40px;
+      padding: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 刘海 */
+    .notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 180px;
+      height: 30px;
+      background: #000;
+      border-radius: 0 0 20px 20px;
+      z-index: 10;
+    }
+
+    /* 屏幕 */
+    .screen {
+      width: 100%;
+      height: 100%;
+      background: #F8FAFC;
+      border-radius: 30px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    /* 状态栏 */
+    .status-bar {
+      height: 44px;
+      background: #FFFFFF;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 12px;
+      color: #000;
+    }
+
+    .status-time {
+      font-weight: 600;
+    }
+
+    .status-icons {
+      display: flex;
+      gap: 4px;
+    }
+
+    /* 导航栏 */
+    .navigation-bar {
+      height: 44px;
+      background: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid #F0F0F0;
+      position: relative;
+    }
+
+    .nav-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #000;
+    }
+
+    /* 页面内容 */
+    .page-content {
+      padding: 24px 16px;
+      min-height: calc(100% - 88px);
+    }
+
+    /* Header Section */
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .logo-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-5px);
+      }
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1A1A2E;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #6B7280;
+      line-height: 20px;
+    }
+
+    /* Form Section */
+    .form-section {
+      margin-bottom: 28px;
+    }
+
+    .form-item {
+      margin-bottom: 16px;
+    }
+
+    .label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1A1A2E;
+      margin-bottom: 8px;
+      padding-left: 4px;
+    }
+
+    /* Input Wrapper with Soft UI Style */
+    .input-wrapper, .picker-wrapper {
+      display: flex;
+      align-items: center;
+      background: #F1F5F9;
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.05),
+                  inset -1px -1px 2px rgba(255, 255, 255, 0.8);
+      transition: all 0.3s ease;
+      cursor: text;
+    }
+
+    .input-wrapper:hover, .picker-wrapper:hover {
+      background: #E5E9ED;
+    }
+
+    .input-wrapper.focused {
+      background: #FFFFFF;
+      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1),
+                  0 2px 6px rgba(102, 126, 234, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .input-icon {
+      width: 18px;
+      height: 18px;
+      margin-right: 8px;
+      opacity: 0.6;
+    }
+
+    .input-field {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 14px;
+      color: #1A1A2E;
+    }
+
+    .input-field::placeholder {
+      color: #9CA3AF;
+    }
+
+    /* Picker Styles */
+    .picker-wrapper {
+      cursor: pointer;
+      position: relative;
+    }
+
+    .picker-value {
+      flex: 1;
+      font-size: 14px;
+      color: #1A1A2E;
+      font-weight: 500;
+    }
+
+    .picker-placeholder {
+      flex: 1;
+      font-size: 14px;
+      color: #9CA3AF;
+    }
+
+    .arrow-icon {
+      width: 14px;
+      height: 14px;
+      margin-left: 8px;
+      opacity: 0.5;
+      transition: transform 0.3s ease;
+    }
+
+    .picker-wrapper:active .arrow-icon {
+      transform: rotate(180deg);
+    }
+
+    /* Dropdown Menu */
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #FFFFFF;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      margin-top: 4px;
+      z-index: 1000;
+      overflow: hidden;
+      display: none;
+    }
+
+    .dropdown-menu.show {
+      display: block;
+      animation: slideDown 0.2s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .dropdown-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      font-size: 14px;
+      color: #1A1A2E;
+    }
+
+    .dropdown-item:hover {
+      background: #F1F5F9;
+    }
+
+    .dropdown-item.selected {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667EEA;
+      font-weight: 600;
+    }
+
+    /* Tips Section */
+    .tips-wrapper {
+      display: flex;
+      align-items: flex-start;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+      border-radius: 6px;
+      padding: 10px;
+      margin-top: 8px;
+    }
+
+    .tips-icon {
+      font-size: 16px;
+      margin-right: 6px;
+      margin-top: 1px;
+    }
+
+    .tips-text {
+      flex: 1;
+      font-size: 12px;
+      color: #6B7280;
+      line-height: 18px;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+      width: 100%;
+      margin-top: 28px;
+      background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+      border-radius: 8px;
+      padding: 16px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    }
+
+    .submit-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 6px rgba(102, 126, 234, 0.2);
+    }
+
+    .submit-btn:disabled {
+      background: linear-gradient(135deg, #D1D5DB 0%, #9CA3AF 100%);
+      box-shadow: 0 2px 6px rgba(156, 163, 175, 0.2);
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: #FFFFFF;
+      letter-spacing: 1px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: #FFFFFF;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      display: block;
+      animation: fadeInOut 2s ease;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% {
+        opacity: 0;
+      }
+      10%, 90% {
+        opacity: 1;
+      }
+    }
+
+    /* SVG Icons as Background */
+    .icon-user {
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>') no-repeat center;
+      background-size: contain;
+    }
+
+    .icon-grade {
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>') no-repeat center;
+      background-size: contain;
+    }
+
+    .icon-id-card {
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M8 11h.01M8 15h6M16 11h.01"/></svg>') no-repeat center;
+      background-size: contain;
+    }
+
+    .icon-lock {
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>') no-repeat center;
+      background-size: contain;
+    }
+
+    .icon-arrow-down {
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>') no-repeat center;
+      background-size: contain;
+    }
+
+    /* Info Section */
+    .info-section {
+      margin-top: 40px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .info-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 12px;
+    }
+
+    .info-list {
+      list-style: none;
+      color: #FFFFFF;
+      font-size: 14px;
+      line-height: 24px;
+    }
+
+    .info-list li {
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .info-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #4ADE80;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- 手机框架 -->
+  <div class="phone-frame">
+    <div class="notch"></div>
+    <div class="screen">
+      <!-- 状态栏 -->
+      <div class="status-bar">
+        <div class="status-time">9:41</div>
+        <div class="status-icons">
+          <span>📶</span>
+          <span>📡</span>
+          <span>🔋</span>
+        </div>
+      </div>
+
+      <!-- 导航栏 -->
+      <div class="navigation-bar">
+        <div class="nav-title">学生身份绑定</div>
+      </div>
+
+      <!-- 页面内容 -->
+      <div class="page-content">
+        <!-- Header Section -->
+        <div class="header">
+          <div class="logo-wrapper">
+            <div class="logo"></div>
+          </div>
+          <div class="title">身份绑定</div>
+          <div class="subtitle">输入您的真实信息完成学生身份验证</div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-section">
+          <!-- 真实姓名输入 -->
+          <div class="form-item">
+            <div class="label">真实姓名</div>
+            <div class="input-wrapper" id="nameWrapper">
+              <div class="input-icon icon-user"></div>
+              <input 
+                type="text" 
+                class="input-field" 
+                id="nameInput"
+                placeholder="请输入您的姓名"
+                maxlength="20"
+              />
+            </div>
+          </div>
+
+          <!-- 年级选择器 -->
+          <div class="form-item">
+            <div class="label">年级</div>
+            <div class="picker-wrapper" id="gradePicker">
+              <div class="input-icon icon-grade"></div>
+              <div class="picker-placeholder" id="gradeText">请选择您的年级</div>
+              <div class="arrow-icon icon-arrow-down"></div>
+              <div class="dropdown-menu" id="gradeDropdown">
+                <div class="dropdown-item" data-value="0">22级</div>
+                <div class="dropdown-item" data-value="1">23级</div>
+                <div class="dropdown-item" data-value="2">24级</div>
+                <div class="dropdown-item" data-value="3">25级</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 学号输入 -->
+          <div class="form-item">
+            <div class="label">学号</div>
+            <div class="input-wrapper" id="studentIdWrapper">
+              <div class="input-icon icon-id-card"></div>
+              <input 
+                type="text" 
+                class="input-field" 
+                id="studentIdInput"
+                placeholder="请输入您的学号"
+                maxlength="20"
+              />
+            </div>
+          </div>
+
+          <!-- 密码输入 -->
+          <div class="form-item">
+            <div class="label">密码</div>
+            <div class="input-wrapper" id="passwordWrapper">
+              <div class="input-icon icon-lock"></div>
+              <input 
+                type="password" 
+                class="input-field" 
+                id="passwordInput"
+                placeholder="请输入您的密码"
+                maxlength="20"
+              />
+            </div>
+          </div>
+
+          <!-- 提示文字 -->
+          <div class="tips-wrapper">
+            <div class="tips-icon">ℹ️</div>
+            <div class="tips-text">请确保您输入的信息真实有效，以便完成身份验证</div>
+          </div>
+        </div>
+
+        <!-- 确认绑定按钮 -->
+        <button class="submit-btn" id="submitBtn" disabled>
+          <span class="btn-text">确认绑定</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Info Section -->
+  <div class="info-section">
+    <div class="info-title">UI/UX 优化特性</div>
+    <ul class="info-list">
+      <li>采用 Soft UI 设计风格，柔和阴影效果</li>
+      <li>8px 栅格系统，统一间距规范</li>
+      <li>主色 #1E5AA8（学院蓝）+ 渐变紫蓝（#667EEA/#764BA2）</li>
+      <li>输入框带图标，聚焦态动画效果</li>
+      <li>年级下拉选择器，流畅交互体验</li>
+      <li>按钮渐变背景，点击态反馈</li>
+      <li>表单实时验证，智能提示</li>
+    </ul>
+  </div>
+
+  <script>
+    // 表单数据
+    let formData = {
+      name: '',
+      gradeIndex: -1,
+      studentId: '',
+      password: ''
+    };
+
+    const gradeList = ['22级', '23级', '24级', '25级'];
+
+    // 获取元素
+    const nameInput = document.getElementById('nameInput');
+    const studentIdInput = document.getElementById('studentIdInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const gradePicker = document.getElementById('gradePicker');
+    const gradeText = document.getElementById('gradeText');
+    const gradeDropdown = document.getElementById('gradeDropdown');
+    const submitBtn = document.getElementById('submitBtn');
+    const toast = document.getElementById('toast');
+
+    // 输入框聚焦效果
+    [nameInput, studentIdInput, passwordInput].forEach((input, index) => {
+      const wrappers = [
+        document.getElementById('nameWrapper'),
+        document.getElementById('studentIdWrapper'),
+        document.getElementById('passwordWrapper')
+      ];
+
+      input.addEventListener('focus', () => {
+        wrappers[index].classList.add('focused');
+      });
+
+      input.addEventListener('blur', () => {
+        wrappers[index].classList.remove('focused');
+      });
+
+      input.addEventListener('input', (e) => {
+        const field = ['name', 'studentId', 'password'][index];
+        formData[field] = e.target.value;
+        checkCanSubmit();
+      });
+    });
+
+    // 年级选择器
+    gradePicker.addEventListener('click', (e) => {
+      if (e.target.closest('.dropdown-item')) return;
+      gradeDropdown.classList.toggle('show');
+    });
+
+    // 选择年级
+    gradeDropdown.addEventListener('click', (e) => {
+      if (e.target.classList.contains('dropdown-item')) {
+        const value = parseInt(e.target.dataset.value);
+        formData.gradeIndex = value;
+        
+        // 更新显示
+        gradeText.textContent = gradeList[value];
+        gradeText.classList.remove('picker-placeholder');
+        gradeText.classList.add('picker-value');
+        
+        // 更新选中状态
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+          item.classList.remove('selected');
+        });
+        e.target.classList.add('selected');
+        
+        gradeDropdown.classList.remove('show');
+        checkCanSubmit();
+      }
+    });
+
+    // 点击外部关闭下拉菜单
+    document.addEventListener('click', (e) => {
+      if (!gradePicker.contains(e.target)) {
+        gradeDropdown.classList.remove('show');
+      }
+    });
+
+    // 检查是否可以提交
+    function checkCanSubmit() {
+      const canSubmit = formData.name.trim() !== '' &&
+                       formData.gradeIndex >= 0 &&
+                       formData.studentId.trim() !== '' &&
+                       formData.password.trim() !== '';
+      
+      submitBtn.disabled = !canSubmit;
+    }
+
+    // 显示提示
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    // 表单验证
+    function validateForm() {
+      if (!formData.name || formData.name.trim() === '') {
+        showToast('请输入姓名');
+        return false;
+      }
+
+      if (formData.gradeIndex < 0) {
+        showToast('请选择年级');
+        return false;
+      }
+
+      if (!formData.studentId || formData.studentId.trim() === '') {
+        showToast('请输入学号');
+        return false;
+      }
+
+      if (formData.studentId.length < 6) {
+        showToast('学号格式不正确');
+        return false;
+      }
+
+      if (!formData.password || formData.password.trim() === '') {
+        showToast('请输入密码');
+        return false;
+      }
+
+      if (formData.password.length < 6) {
+        showToast('密码长度至少6位');
+        return false;
+      }
+
+      return true;
+    }
+
+    // 提交表单
+    submitBtn.addEventListener('click', () => {
+      if (!validateForm()) {
+        return;
+      }
+
+      // 显示成功提示
+      showToast('绑定成功！');
+      
+      // 模拟提交后的操作
+      setTimeout(() => {
+        console.log('提交表单:', {
+          name: formData.name,
+          grade: gradeList[formData.gradeIndex],
+          studentId: formData.studentId,
+          password: '******'
+        });
+      }, 500);
+    });
+  </script>
+</body>
+</html>
