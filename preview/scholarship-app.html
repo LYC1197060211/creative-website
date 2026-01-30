@@ -171,10 +171,16 @@
       opacity: 1;
     }
 
-    .role-card:active {
+    .role-card:active,
+    .role-card.active {
       transform: scale(0.98);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
                   0 1px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    .role-card:focus {
+      outline: 2px solid #1E5AA8;
+      outline-offset: 2px;
     }
 
     /* 图标容器 */
@@ -296,6 +302,12 @@
       line-height: 1.8;
     }
 
+    .footer-credit {
+      margin-top: 4px;
+      font-size: 11px;
+      color: #CBD5E1;
+    }
+
     /* 响应式 */
     @media (max-width: 400px) {
       .phone-frame {
@@ -325,7 +337,7 @@
         <!-- 角色选择卡片 -->
         <div class="cards-container">
           <!-- 本科生卡片 -->
-          <div class="role-card undergraduate" onclick="handleRoleClick('undergraduate')">
+          <div class="role-card undergraduate" onclick="handleRoleClick(event, 'undergraduate')" role="button" tabindex="0" onkeypress="handleKeyPress(event, 'undergraduate')">
             <div class="icon-container">
               <!-- 本科生 SVG 图标 -->
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -343,7 +355,7 @@
           </div>
 
           <!-- 研究生卡片 -->
-          <div class="role-card graduate" onclick="handleRoleClick('graduate')">
+          <div class="role-card graduate" onclick="handleRoleClick(event, 'graduate')" role="button" tabindex="0" onkeypress="handleKeyPress(event, 'graduate')">
             <div class="icon-container">
               <!-- 研究生 SVG 图标 -->
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -366,38 +378,46 @@
         <!-- 底部提示 -->
         <div class="footer-hint">
           <p>请选择您的身份进入相应的评选系统</p>
-          <p style="margin-top: 4px; font-size: 11px; color: #CBD5E1;">UI Design by UI/UX Pro Max</p>
+          <p class="footer-credit">UI Design by UI/UX Pro Max</p>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    function handleRoleClick(role) {
+    function handleRoleClick(event, role) {
       const card = event.currentTarget;
       
       // 添加点击动画
-      card.style.transition = 'transform 0.1s ease';
-      card.style.transform = 'scale(0.95)';
+      card.classList.add('active');
       
       setTimeout(() => {
-        card.style.transform = '';
+        card.classList.remove('active');
         
         // 这里可以添加实际的导航逻辑
         console.log(`Selected role: ${role}`);
-        alert(`您选择了：${role === 'undergraduate' ? '本科生' : '研究生'}`);
+        // For preview purposes, just log to console
+        // In production, this would navigate to the appropriate page
       }, 100);
+    }
+
+    function handleKeyPress(event, role) {
+      // Handle Enter and Space key presses for accessibility
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        handleRoleClick(event, role);
+      }
     }
 
     // 添加触摸支持
     document.querySelectorAll('.role-card').forEach(card => {
       card.addEventListener('touchstart', function(e) {
-        this.style.transform = 'scale(0.98)';
+        this.classList.add('active');
       });
       
       card.addEventListener('touchend', function(e) {
         setTimeout(() => {
-          this.style.transform = '';
+          this.classList.remove('active');
         }, 100);
       });
     });
