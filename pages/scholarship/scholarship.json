@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "奖学金评选系统",
+  "navigationBarBackgroundColor": "#1E5AA8",
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": false,
+  "backgroundColor": "#F8FAFC",
+  "backgroundTextStyle": "dark"
+}
