@@ -757,9 +757,9 @@
         <div class="list-item">
           <div class="item-content">
             <select class="item-select" onchange="updateAchievement(${idx}, 'type', this.value)">
-              <option value="0" ${item.type === 0 ? 'selected' : ''}>SCI研究性/发明专利</option>
-              <option value="1" ${item.type === 1 ? 'selected' : ''}>SCI综述性</option>
-              <option value="2" ${item.type === 2 ? 'selected' : ''}>其他学术</option>
+              <option value="0" ${item.type === 0 ? 'selected' : ''}>SCI研究性论文/发明专利</option>
+              <option value="1" ${item.type === 1 ? 'selected' : ''}>SCI综述性论文</option>
+              <option value="2" ${item.type === 2 ? 'selected' : ''}>其他学术论文</option>
             </select>
             <select class="item-select" onchange="updateAchievement(${idx}, 'author', this.value)">
               <option value="0" ${item.author === 0 ? 'selected' : ''}>第一作者</option>
@@ -802,10 +802,10 @@
         <div class="list-item">
           <div class="item-content">
             <select class="item-select" onchange="updateProject(${idx}, 'type', this.value)">
-              <option value="0" ${item.type === 0 ? 'selected' : ''}>国家级项目</option>
-              <option value="1" ${item.type === 1 ? 'selected' : ''}>上海市项目</option>
-              <option value="2" ${item.type === 2 ? 'selected' : ''}>校级/大夏基金</option>
-              <option value="3" ${item.type === 3 ? 'selected' : ''}>师范生研习</option>
+              <option value="0" ${item.type === 0 ? 'selected' : ''}>国家级项目结项</option>
+              <option value="1" ${item.type === 1 ? 'selected' : ''}>上海市项目结项</option>
+              <option value="2" ${item.type === 2 ? 'selected' : ''}>校级项目/大夏科研基金</option>
+              <option value="3" ${item.type === 3 ? 'selected' : ''}>师范生教育研习</option>
             </select>
             <select class="item-select" onchange="updateProject(${idx}, 'role', this.value)">
               <option value="0" ${item.role === 0 ? 'selected' : ''}>负责人</option>
